@@ -18,7 +18,7 @@ class RoboScientist(object):
             'test_mse': None,
         }
         while not new_env.is_explored(**success_measurements):
-            X_train = 50 * torch.rand(1000, 1)
+            X_train = 50 * torch.rand(1000, 3)
             new_env.connect()
             new_env.run_experiments(X_train)
             while not new_env.are_experiments_finished():
@@ -28,7 +28,7 @@ class RoboScientist(object):
             success_measurements['loss'] = new_theory.train(X_train, y_train)
             print('loss:', success_measurements['loss'].item())
 
-            X_test = 10 * torch.rand(1000, 1)
+            X_test = 10 * torch.rand(1000, 3)
             new_env.connect()
             new_env.run_experiments(X_test)
             while not new_env.are_experiments_finished():
