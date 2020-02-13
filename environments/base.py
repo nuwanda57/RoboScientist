@@ -34,6 +34,7 @@ class EnvironmentBase(object):
         self._experiments_finished = None
         self._success_criterion = success_criterion
         self._description = EnvironmentParams(None)
+        self.parameters_count = None
 
     def describe(self) -> EnvironmentParams:
         return self._description

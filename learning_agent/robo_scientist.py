@@ -18,7 +18,7 @@ class RoboScientist(object):
             'test_mse': None,
         }
         while not new_env.is_explored(**success_measurements):
-            X_train = 50 * torch.rand(1000, 3)
+            X_train = 50 * torch.rand(1000, new_env.parameters_count)
             new_env.connect()
             new_env.run_experiments(X_train)
             while not new_env.are_experiments_finished():
