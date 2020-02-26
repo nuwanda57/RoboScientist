@@ -14,6 +14,7 @@ class LinearLawEnvironment(base.EnvironmentBase):
         super().__init__(sc.LossSuccessCriterion(1))
         self._description = base.EnvironmentParams(1)
         self._a, self._b = a, b
+        self.parameters_count = 1
 
     def run_experiments(self, input_data: torch.Tensor):
         """
