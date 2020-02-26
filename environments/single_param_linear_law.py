@@ -5,11 +5,12 @@ import torch
 
 class LinearLawEnvironment(base.EnvironmentBase):
     """
-    Environment representing the Ohm's law.
+    Environment a*x + b.
     """
     def __init__(self, a: float, b: float):
         """
-        :param resistance: Resistance value in the Ohm's law.
+        :param a
+        :param b
         """
         super().__init__(sc.LossSuccessCriterion(1))
         self._description = base.EnvironmentParams(1)

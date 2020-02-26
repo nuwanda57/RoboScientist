@@ -5,11 +5,9 @@ import torch
 
 class UniversalGravityEnvironment(base.EnvironmentBase):
     """
-    Environment representing the Ohm's law.
+    Environment representing 3 body gravitation.
     """
     def __init__(self):
-        """
-        """
         super().__init__(sc.LossSuccessCriterion(1e-1))
         self._description = base.EnvironmentParams(1)
         self.G = 6.67430 * 1e-11
