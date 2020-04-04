@@ -1,16 +1,9 @@
 import numpy as np
 import os
 import shutil
-import subprocess
-from subprocess import call
-from baseline.S_multipolyfit import getBest
-import sys
-import csv
-from baseline.S_polyclean_file import polyfit
 from baseline.S_NN_sep_mult import NN_sep_mult
 from baseline.S_NN_sep_add import NN_sep_add
 from baseline.S_NN_equal_vars import NN_equal_vars
-from baseline.S_brute_force import brute_force
 from baseline.S_get_inverse import get_inverse
 from baseline.S_get_log import get_log
 from baseline.S_get_exp import get_exp
@@ -31,7 +24,6 @@ from baseline.S_translational_symmetry_divide import translational_symmetry_divi
 from baseline.S_translational_symmetry_plus import translational_symmetry_plus
 from baseline.S_NN_train import NN_train
 from baseline.S_generate_new_dimRed_xlsx_file_translation import generate_new_dimRed_xlsx_file_translation
-from baseline.S_replace_variables import replace_variables
 from baseline.S_NN_eval import NN_eval
 from baseline.S_generate_new_dimRed_xlsx_file_equal_vars import generate_new_dimRed_xlsx_file_equal_vars
 from baseline.S_get_RMS import get_RMS
@@ -55,38 +47,11 @@ from baseline.S_try_bf_polyfit import try_bf_polyfit
 from baseline.S_generate_new_dimRed_xlsx_file_transf_input import generate_new_dimRed_xlsx_file_transf_input
 from baseline.S_generate_new_dimRed_xlsx_file_separable import generate_new_dimRed_xlsx_file_separable
 import pandas as pd
-from tqdm import tqdm
 from sympy import *
 from sympy.parsing.sympy_parser import parse_expr
 import time
 
-try:
-    os.mkdir("results/")
-except:
-    pass
-try:
-    os.mkdir("results/solved/")
-except:
-    pass
-try:
-    os.mkdir("results/solutions/")
-except:
-    pass
-try:
-    os.mkdir("results/NN_trained_models/")
-except:
-    pass
-try:
-    os.mkdir("results/NN_trained_models/models/")
-except:
-    pass
-try:
-    os.mkdir("results/equal_variables/")
-
-except:
-    pass
-solved_dir = "results/solved/"
-
+# [NUWANDA]: deleted results/ directory
 
 VERBOSE = True
 
@@ -979,96 +944,57 @@ def find_formula(pathdir, filename, methods_tried, maxdeg_polyfit, err_threshold
 
 ################################ MAIN PROGRAM ################################
 
-def aiFeynman(pathdir, maxdeg_polyfit=4, err_threshold_polyfit=0.0001, BF_try_time=60, BF_error_threshold=0.00001,
+
+# [NUWANDA]: instead of pathdir argument we use X_train, y_train
+def aiFeynman(X_train, y_train, maxdeg_polyfit=4, err_threshold_polyfit=0.0001, BF_try_time=60,
+              BF_error_threshold=0.00001,
               BF_ops_file_type="14ops.txt", type_of_BF=2, first_run=1, dim_red_file="", use_MDL=0, time_limit=3600,
               move_dir=0, make_eq_vars=1, check_prefactor=1, NN_train_epochs=-1, err_sep_mult_factor=-1,
               err_sep_add_factor=-1, err_sym_divide_factor=-1, err_sym_mult_factor=-1, err_sym_plus_factor=-1,
               err_sym_minus_factor=-1):
-    # separate the name of the file and the name of the directory
-    fn_list = [pathdir[pathdir.rfind('/') + 1:]]
-    if VERBOSE: print(fn_list)
-    pathdir = pathdir[0:pathdir.rfind('/') + 1]
-
-    nn_vars = np.loadtxt(pathdir + fn_list[0], dtype='str').shape[1] - 1
-    # create a variables file, if dim_red_file=""
-    if dim_red_file == "":
-        dim_red_file = create_variables_file(nn_vars, fn_list[0])
-
-    original_dir = pathdir
     formulas_solved_part = pd.read_excel(dim_red_file)["Formula"]
     filename_solved_part = pd.read_excel(dim_red_file)["Filename"]
 
-    for filename in fn_list:
-        try:
-            print(filename)
-            methods_tried = ["dim_analysis"]
-            # file to write the solution
-            file_exist = 0
-            if (os.path.exists(pathdir + filename)):
-                file_exist = 1
-                solved_file = open("results/solutions/" + filename + ".txt", "w")
+    try:
+        methods_tried = ["dim_analysis"]
+        # file to write the solution
 
-            ################################ DIMENSIONAL ANALYSIS ################################
-            # Check if it got solved by dimensional analysis
-            dim_check = open(pathdir + filename, "r").readlines()
-            if (len(dim_check[0].split()) == 1):
-                methods_tried = methods_tried + ["solved"]
-                shutil.move(original_dir + filename.split('-')[0], solved_dir)
-                solved_file.write(filename)
-                solved_file.write(" ")
-                for k in range(len(filename_solved_part)):
-                    if filename_solved_part[k] == filename:
-                        solved_file.write(str(parse_expr(str(np.round(float(dim_check[0].split()[0]), 3))) * parse_expr(
-                            formulas_solved_part[k])))
-                solved_file.write(" ")
-                solved_file.write(str(methods_tried))
-                solved_file.write("\n")
-                continue
+        translational_operations = []  # use this to keep track of the translational operations. The format should be ["*",i,j,"-",k,l]
+        # check if the formula was found at all and save it to file
+        start_time = time.time()
 
-            translational_operations = []  # use this to keep track of the translational operations. The format should be ["*",i,j,"-",k,l]
-            # check if the formula was found at all and save it to file
-            start_time = time.time()
+        formula, methods_tried, _, = find_formula(pathdir, filename, methods_tried, maxdeg_polyfit,
+                                                  err_threshold_polyfit, BF_try_time, BF_error_threshold,
+                                                  BF_ops_file_type, type_of_BF, first_run, dim_red_file, use_MDL,
+                                                  move_dir, time_limit, make_eq_vars, check_prefactor,
+                                                  NN_train_epochs, err_sep_mult_factor, err_sep_add_factor,
+                                                  err_sym_divide_factor, err_sym_mult_factor, err_sym_plus_factor,
+                                                  err_sym_minus_factor)
 
-            formula, methods_tried, _, = find_formula(pathdir, filename, methods_tried, maxdeg_polyfit,
-                                                      err_threshold_polyfit, BF_try_time, BF_error_threshold,
-                                                      BF_ops_file_type, type_of_BF, first_run, dim_red_file, use_MDL,
-                                                      move_dir, time_limit, make_eq_vars, check_prefactor,
-                                                      NN_train_epochs, err_sep_mult_factor, err_sep_add_factor,
-                                                      err_sym_divide_factor, err_sym_mult_factor, err_sym_plus_factor,
-                                                      err_sym_minus_factor)
-
-            print("FORMULA: ", formula)
-            if formula != 0:
-                solved_file.write(filename)
-                solved_file.write(" ")
-                for k in range(len(filename_solved_part)):
-                    if filename_solved_part[k] == filename:
-                        if formulas_solved_part[k] == " " or formulas_solved_part[k] == 1 or formulas_solved_part[
-                            k] == "" or np.isnan(formulas_solved_part[k]):
-                            solved_file.write(str(formula))
-                        else:
-                            print("Saved to file!!!!!")
-                            print(formula)
-                            print(formulas_solved_part[k])
-                            solved_file.write(str(simplify(formula * parse_expr(formulas_solved_part[k]))))
-                            print("Saved to file!!!!!")
-                solved_file.write(" ")
-                print("METHODS: ", methods_tried)
-                solved_file.write(str(methods_tried))
-                solved_file.write(" ")
-                solved_file.write(str(time.time() - start_time))
-                print("Saved to file!!!!!")
-                solved_file.write("\n")
-            else:
-                continue
-
+        print("FORMULA: ", formula)
+        if formula != 0:
+            solved_file.write(filename)
+            solved_file.write(" ")
+            for k in range(len(filename_solved_part)):
+                if filename_solved_part[k] == filename:
+                    if formulas_solved_part[k] == " " or formulas_solved_part[k] == 1 or formulas_solved_part[
+                        k] == "" or np.isnan(formulas_solved_part[k]):
+                        solved_file.write(str(formula))
+                    else:
+                        print("Saved to file!!!!!")
+                        print(formula)
+                        print(formulas_solved_part[k])
+                        solved_file.write(str(simplify(formula * parse_expr(formulas_solved_part[k]))))
+                        print("Saved to file!!!!!")
+            solved_file.write(" ")
+            print("METHODS: ", methods_tried)
+            solved_file.write(str(methods_tried))
+            solved_file.write(" ")
+            solved_file.write(str(time.time() - start_time))
+            print("Saved to file!!!!!")
+            solved_file.write("\n")
             if file_exist == 1:
                 solved_file.close()
 
-        except Exception as e:
-            print(e)
-            continue
-
-
-
-
+    except Exception as e:
+        print(e)

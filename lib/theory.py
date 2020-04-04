@@ -5,9 +5,10 @@ import torch.optim as optim
 
 
 class Theory(object):
-    def __init__(self, params_cnt=1, model=None):
+    def __init__(self, params_cnt=1, model=models.SingleParameterFormula(1)):
         self._params_cnt = params_cnt
-        self._model = models.SingleParameterFormula(1)
+        self._model = model
+        self._formula_string = None
 
     def train(self, X_train, y_train):
         optimizer = optim.Adam(self._model.parameters(), lr=0.01)

@@ -35,6 +35,9 @@ class EnvironmentBase(object):
     def describe(self) -> EnvironmentParams:
         return self._description
 
+    def get_default_input(self):
+        return None
+
     def is_explored(self, **success_measurements) -> bool:
         return self._success_criterion.is_satisfied(**success_measurements)
 

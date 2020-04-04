@@ -1,22 +1,10 @@
 import shutil
 
-from S_replace_variables import replace_variables
-from S_brute_force import brute_force
-from S_multipolyfit import getBest
-from S_polyclean_file import polyfit
+from baseline.S_replace_variables import replace_variables
+from baseline.S_brute_force import brute_force
+from baseline.S_multipolyfit import getBest
+from baseline.S_polyclean_file import polyfit
 
-
-from S_get_inverse import get_inverse
-from S_get_log import get_log
-from S_get_exp import get_exp
-from S_get_sin import get_sin
-from S_get_asin import get_asin
-from S_get_cos import get_cos
-from S_get_acos import get_acos
-from S_get_tan import get_tan
-from S_get_atan import get_atan
-from S_get_squared import get_squared
-from S_get_sqrt import get_sqrt
 
 def try_bf_polyfit(pathdir, filename, methods_tried, BF_try_time, BF_ops_file_type, BF_sep_type, use_MDL, check_prefactor, dim_red_file, maxdeg_polyfit, err_threshold_polyfit, first_run, move_dir, original_dir, solved_dir, BF_transf_name, poly_transf_name):
     if first_run:
