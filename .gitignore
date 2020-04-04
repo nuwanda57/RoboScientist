@@ -2,4 +2,6 @@
 .idea
 .git
 *.ipynb_checkpoints
+*.x
+baseline/results/
 
