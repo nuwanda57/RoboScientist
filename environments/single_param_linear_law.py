@@ -23,6 +23,4 @@ class LinearLawEnvironment(base.EnvironmentBase):
         :return: tensor of shape (?, 1) - resulting voltages
         """
         super().run_experiments(input_data)
-        self._inputs = input_data
-        self._outputs = self._inputs * self._a + self._b
-        self._experiments_finished = True
+        return input_data * self._a + self._b

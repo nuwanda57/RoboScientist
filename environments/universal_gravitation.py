@@ -19,6 +19,4 @@ class UniversalGravityEnvironment(base.EnvironmentBase):
         :return: tensor of shape (?, 1) - resulting gravitational force
         """
         super().run_experiments(input_data)
-        self._inputs = input_data
-        self._outputs = (self.G * self._inputs[:, 0] * self._inputs[:, 1] / self._inputs[:, 2]**2).reshape(-1, 1)
-        self._experiments_finished = True
+        return (self.G * input_data[:, 0] * input_data[:, 1] / input_data[:, 2]**2).reshape(-1, 1)
