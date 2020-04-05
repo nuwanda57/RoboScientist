@@ -3,12 +3,18 @@ import torch.nn as nn
 import torch
 import torch.optim as optim
 
+from copy import deepcopy
+
 
 class Theory(object):
-    def __init__(self, params_cnt=1, model=models.SingleParameterFormula(1)):
+    def __init__(self, params_cnt=1, model=models.SingleParameterFormula(1), formula_string=None, additional_data=None):
         self._params_cnt = params_cnt
         self._model = model
         self._formula_string = None
+        if additional_data == None:
+            self._additional_data = {}
+        else:
+            self._additional_data = deepcopy(additional_data)
 
     def train(self, X_train, y_train):
         optimizer = optim.Adam(self._model.parameters(), lr=0.01)

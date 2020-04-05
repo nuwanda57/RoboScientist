@@ -1,6 +1,9 @@
 import numpy as np
 import os
 import shutil
+
+from baseline.learning_agent.S_get_RMS import get_RMS
+
 from baseline.S_NN_sep_mult import NN_sep_mult
 from baseline.S_NN_sep_add import NN_sep_add
 from baseline.S_NN_equal_vars import NN_equal_vars
@@ -26,7 +29,6 @@ from baseline.S_NN_train import NN_train
 from baseline.S_generate_new_dimRed_xlsx_file_translation import generate_new_dimRed_xlsx_file_translation
 from baseline.S_NN_eval import NN_eval
 from baseline.S_generate_new_dimRed_xlsx_file_equal_vars import generate_new_dimRed_xlsx_file_equal_vars
-from baseline.S_get_RMS import get_RMS
 from baseline.S_create_variables_file import create_variables_file
 
 from baseline.S_change_input import input_divide_2
@@ -51,24 +53,26 @@ from sympy import *
 from sympy.parsing.sympy_parser import parse_expr
 import time
 
+from lib.theory import Theory
+
 # [NUWANDA]: deleted results/ directory
 
 VERBOSE = True
 
 
-def find_formula(pathdir, filename, methods_tried, maxdeg_polyfit, err_threshold_polyfit, BF_try_time,
+def find_formula(X_train, y_train, methods_tried, maxdeg_polyfit, err_threshold_polyfit, BF_try_time,
                  BF_error_threshold, BF_ops_file_type, BF_sep_type, first_run, dim_red_file, use_MDL, move_dir,
                  time_limit, make_eq_vars, check_prefactor, NN_train_epochs, err_sep_mult_factor, err_sep_add_factor,
                  err_sym_divide_factor, err_sym_mult_factor, err_sym_plus_factor, err_sym_minus_factor):
     start_time = time.time()
-    original_dir = pathdir
+    # original_dir = pathdir
 
     try:
 
         # Create a file with the error threshold to be used by the mathematica code
         np.savetxt("BF_error_threshold_file.txt", [BF_error_threshold], fmt='%f')
         # Save the RMS of the output of the function
-        get_RMS(pathdir, filename)
+        RMS = get_RMS(X_train, y_train)
 
         ################################ NO TRANSFORM ################################
         if time.time() - start_time < time_limit:
@@ -952,8 +956,6 @@ def aiFeynman(X_train, y_train, maxdeg_polyfit=4, err_threshold_polyfit=0.0001, 
               move_dir=0, make_eq_vars=1, check_prefactor=1, NN_train_epochs=-1, err_sep_mult_factor=-1,
               err_sep_add_factor=-1, err_sym_divide_factor=-1, err_sym_mult_factor=-1, err_sym_plus_factor=-1,
               err_sym_minus_factor=-1):
-    formulas_solved_part = pd.read_excel(dim_red_file)["Formula"]
-    filename_solved_part = pd.read_excel(dim_red_file)["Filename"]
 
     try:
         methods_tried = ["dim_analysis"]
@@ -963,7 +965,7 @@ def aiFeynman(X_train, y_train, maxdeg_polyfit=4, err_threshold_polyfit=0.0001, 
         # check if the formula was found at all and save it to file
         start_time = time.time()
 
-        formula, methods_tried, _, = find_formula(pathdir, filename, methods_tried, maxdeg_polyfit,
+        formula, methods_tried, _, = find_formula(X_train, y_train, methods_tried, maxdeg_polyfit,
                                                   err_threshold_polyfit, BF_try_time, BF_error_threshold,
                                                   BF_ops_file_type, type_of_BF, first_run, dim_red_file, use_MDL,
                                                   move_dir, time_limit, make_eq_vars, check_prefactor,
@@ -972,29 +974,19 @@ def aiFeynman(X_train, y_train, maxdeg_polyfit=4, err_threshold_polyfit=0.0001, 
                                                   err_sym_minus_factor)
 
         print("FORMULA: ", formula)
+        # solved_file = open("results/solutions/" + filename + ".txt", "w")
         if formula != 0:
-            solved_file.write(filename)
-            solved_file.write(" ")
-            for k in range(len(filename_solved_part)):
-                if filename_solved_part[k] == filename:
-                    if formulas_solved_part[k] == " " or formulas_solved_part[k] == 1 or formulas_solved_part[
-                        k] == "" or np.isnan(formulas_solved_part[k]):
-                        solved_file.write(str(formula))
-                    else:
-                        print("Saved to file!!!!!")
-                        print(formula)
-                        print(formulas_solved_part[k])
-                        solved_file.write(str(simplify(formula * parse_expr(formulas_solved_part[k]))))
-                        print("Saved to file!!!!!")
-            solved_file.write(" ")
-            print("METHODS: ", methods_tried)
-            solved_file.write(str(methods_tried))
-            solved_file.write(" ")
-            solved_file.write(str(time.time() - start_time))
-            print("Saved to file!!!!!")
-            solved_file.write("\n")
-            if file_exist == 1:
-                solved_file.close()
+            # for k in range(len(filename_solved_part)):
+            #     if filename_solved_part[k] == filename:
+            new_theory = Theory(params_cnt=X_train.shape[1],
+                                model=None,
+                                formula_string=formula,
+                                additional_data={
+                                    'methods': methods_tried,
+                                    'time': time.time() - start_time
+                                })
+            return new_theory
 
     except Exception as e:
         print(e)
+        return Theory(params_cnt=X_train.shape[1], model=None)
