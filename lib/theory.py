@@ -10,7 +10,7 @@ class Theory(object):
     def __init__(self, params_cnt=1, model=models.SingleParameterFormula(1), formula_string=None, additional_data=None):
         self._params_cnt = params_cnt
         self._model = model
-        self._formula_string = None
+        self._formula_string = formula_string
         if additional_data == None:
             self._additional_data = {}
         else:
@@ -36,3 +36,6 @@ class Theory(object):
 
     def show_model(self):
         print(self._model)
+
+    def show_formula(self):
+        print(self._formula_string)

@@ -14,7 +14,7 @@ class Environment1(base.EnvironmentBase):
         self.parameters_count = 1
 
     def get_default_input(self):
-        with open('data/env_1_x') as f:
+        with open('./../../environments/data/env_1_x') as f:
             data = [float(a) for a in f.readlines()]
             return torch.FloatTensor(data)
 
