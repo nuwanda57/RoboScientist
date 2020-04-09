@@ -11,15 +11,9 @@ class OhmLawEnvironment(base.EnvironmentBase):
         """
         :param resistance: Resistance value in the Ohm's law.
         """
-        super().__init__(sc.LossSuccessCriterion(1e-1))
-        self._description = base.EnvironmentParams(1)
+        super().__init__(1)
         self._resistance = resistance
-        self.parameters_count = 1
 
     def run_experiments(self, input_data: torch.Tensor):
-        """
-        :param input_data: tensor of shape (?, 1) - currents
-        :return: tensor of shape (?, 1) - resulting voltages
-        """
         super().run_experiments(input_data)
         return input_data * self._resistance

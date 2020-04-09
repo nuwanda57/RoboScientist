@@ -60,35 +60,8 @@ from sympy import *
 from sympy.parsing.sympy_parser import parse_expr
 import time
 
-try:
-    os.mkdir("results/")
-except:
-    pass
-try:
-    os.mkdir("results/solved/")
-except:
-    pass
-try:
-    os.mkdir("results/solutions/")
-except:
-    pass
-try:
-    os.mkdir("results/NN_trained_models/")
-except:
-    pass
-try:
-    os.mkdir("results/NN_trained_models/models/")
-except:
-    pass
-try:
-    os.mkdir("results/equal_variables/")
 
-except:
-    pass
 solved_dir = "results/solved/"
-
-
-VERBOSE = True
 
 
 def find_formula(pathdir, filename, methods_tried, maxdeg_polyfit, err_threshold_polyfit, BF_try_time,
@@ -984,9 +957,34 @@ def aiFeynman(pathdir, maxdeg_polyfit=4, err_threshold_polyfit=0.0001, BF_try_ti
               move_dir=0, make_eq_vars=1, check_prefactor=1, NN_train_epochs=-1, err_sep_mult_factor=-1,
               err_sep_add_factor=-1, err_sym_divide_factor=-1, err_sym_mult_factor=-1, err_sym_plus_factor=-1,
               err_sym_minus_factor=-1):
+    try:
+        os.mkdir("results/")
+    except:
+        pass
+    try:
+        os.mkdir("results/solved/")
+    except:
+        pass
+    try:
+        os.mkdir("results/solutions/")
+    except:
+        pass
+    try:
+        os.mkdir("results/NN_trained_models/")
+    except:
+        pass
+    try:
+        os.mkdir("results/NN_trained_models/models/")
+    except:
+        pass
+    try:
+        os.mkdir("results/equal_variables/")
+
+    except:
+        pass
+
     # separate the name of the file and the name of the directory
     fn_list = [pathdir[pathdir.rfind('/') + 1:]]
-    if VERBOSE: print(fn_list)
     pathdir = pathdir[0:pathdir.rfind('/') + 1]
 
     nn_vars = np.loadtxt(pathdir + fn_list[0], dtype='str').shape[1] - 1

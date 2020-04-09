@@ -1,7 +1,9 @@
 import learning_agent.robo_scientist as rs
+import theories.theory_feynman as theory_feynman
+from data_generator import simple_generator
 from environments import ohm_law, single_param_linear_law, universal_gravitation, env_1
+
 import os
-from theories import theory_feynman
 
 
 def main():
@@ -12,13 +14,8 @@ def main():
 
     agent = rs.RoboScientist(working_dirs)
     print('\n\n------------------------------ ENV-1 ------------------------------')
-    agent.explore_environment(env_1.Environment1(), theory_feynman.TheoryFeynman)
-    print('Answer:', agent.get_formula_for_theory(theory_feynman.TheoryFeynman))
-    # print('\n\n------------------------Single Param Linear Law-----------------------')
-    # agent.explore_environment(single_param_linear_law.LinearLawEnvironment(57, 2020))
-
-    # print('\n\n------------------------------Universal Gravity------------------------------')
-    # agent.explore_environment(universal_gravitation.UniversalGravityEnvironment())
+    agent.explore_environment(env_1.Environment1(), theory_feynman.TheoryFeynman, simple_generator.SimpleGenerator)
+    print('\nAnswer:', agent.get_formula_for_theory(theory_feynman.TheoryFeynman))
 
 
 if __name__ == '__main__':

@@ -1,45 +1,21 @@
 import logging
-import lib.success_criterion as sc
-from collections import namedtuple
-
-
-class UnimplementedError(Exception):
-    """Raised when no Implementation exists."""
-    pass
-
-
-class NoConnectionError(Exception):
-    """No connection with Environment. Make sure to connect before running experiments."""
-    pass
-
-
-class ExperimentsRunningError(Exception):
-    """Experiments are still running. Make sure experiments are finished before collecting the results."""
-    pass
-
-
-EnvironmentParams = namedtuple('EnvironmentParams', ['parameters_count'])
+import torch
 
 
 class EnvironmentBase(object):
     """
-    Base class for Environments.
-    Defines protocol between the environments and the learning agent.
+    Mystery environment, runs experiments with input_data.
     """
-    def __init__(self, success_criterion: sc.BaseSuccessCriterion):
+    def __init__(self, parameters_count: int):
+        """
+        :param parameters_count: Number of variables that have to be passed to experiments.
+        """
         self._logger = logging.getLogger('Environment logger')
-        self._success_criterion = success_criterion
-        self._description = EnvironmentParams(None)
-        self.parameters_count = None
+        self.parameters_count = parameters_count
 
-    def describe(self) -> EnvironmentParams:
-        return self._description
-
-    def get_default_input(self):
-        return None
-
-    def is_explored(self, **success_measurements) -> bool:
-        return self._success_criterion.is_satisfied(**success_measurements)
-
-    def run_experiments(self, input_data):
-        return []
+    def run_experiments(self, input_data: torch.Tensor) -> torch.Tensor:
+        """
+        :param input_data: Input data for the experiment.
+        :return: Experiment results fot the input data.
+        """
+        pass
