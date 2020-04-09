@@ -1,32 +1,51 @@
 import environments.base as env_base
-import lib.theory as theory
-import torch
+import theories.base as theory_base
+import data_generator.base as gen_base
+
+from typing import Type, Dict
+from copy import deepcopy
+import os
 
 
 class RoboScientist(object):
     """
     The learning agent.
     """
-    def __init__(self):
-        pass
+    def __init__(self, working_directories: Dict[Type[theory_base.TheoryBase], str]):
+        self._best_theories = {}
+        self._working_directories = working_directories
 
-    def explore_environment(self, new_env: env_base.EnvironmentBase) -> theory.Theory:
-        env_description = new_env.describe()
-        new_theory = theory.Theory(env_description.parameters_count)
-        success_measurements = {
-            'loss': None,
-            'test_mse': None,
-        }
-        while not new_env.is_explored(**success_measurements):
-            X_train = 50 * torch.rand(1000, new_env.parameters_count)
+    def explore_environment(self, new_env: env_base.EnvironmentBase,
+                            theory_class: Type[theory_base.TheoryBase],
+                            generator_class: Type[gen_base.GeneratorBase],
+                            epochs: int = 10) -> theory_base.TheoryBase:
+        """
+        :param new_env: Environment to explore.
+        :param theory_class: Theory class that will be used for the exploration.
+        :param generator_class: Generator class that will be used for the exploration.
+        :param epochs: Number of exploration steps.
+        :return: Best learnt theory.
+        """
+        current_dir = os.getcwd()
+        os.chdir(self._working_directories[theory_class])
+
+        X_train = None
+        generator = generator_class(new_env)
+        theory = theory_class(new_env.parameters_count)
+        formulas = []
+        for epoch in range(epochs):
+            X_train = generator.ask(theory, X_train)
             y_train = new_env.run_experiments(X_train)
-            success_measurements['loss'] = new_theory.train(X_train, y_train)
-            print('loss:', success_measurements['loss'].item())
+            theory.train(X_train, y_train)
+            # TODO(nuwanda): add condition based on MSE here
+            self._best_theories[theory.__class__] = deepcopy(theory)
+            formulas.append(deepcopy(theory.get_formula()))
 
-            X_test = 10 * torch.rand(1000, 3)
-            y_test = new_env.run_experiments(X_test)
-            success_measurements['test_mse'] = new_theory.calculate_test_mse(X_test, y_test)
-            print('test MSE:', success_measurements['test_mse'].item())
-            new_theory.show_model()
+        os.chdir(current_dir)
+        for f in formulas:
+            print('formula:', f)
+        return deepcopy(self._best_theories[theory.__class__])
 
-        return new_theory
+    def get_formula_for_theory(self, theory_class: Type[theory_base.TheoryBase]) -> str:
+        if theory_class in self._best_theories:
+            return self._best_theories[theory_class].get_formula()

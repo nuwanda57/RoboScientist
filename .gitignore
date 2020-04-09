@@ -3,5 +3,5 @@
 .git
 *.ipynb_checkpoints
 *.x
-baseline/results/
+theories/feynman/results/
 

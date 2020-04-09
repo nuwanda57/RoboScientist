@@ -9,18 +9,12 @@ class LinearLawEnvironment(base.EnvironmentBase):
     """
     def __init__(self, a: float, b: float):
         """
-        :param a
-        :param b
+        :param a: a in a*x+b
+        :param b: b in a*x+b
         """
-        super().__init__(sc.LossSuccessCriterion(1))
-        self._description = base.EnvironmentParams(1)
+        super().__init__(1)
         self._a, self._b = a, b
-        self.parameters_count = 1
 
     def run_experiments(self, input_data: torch.Tensor):
-        """
-        :param input_data: tensor of shape (?, 1) - currents
-        :return: tensor of shape (?, 1) - resulting voltages
-        """
         super().run_experiments(input_data)
         return input_data * self._a + self._b
