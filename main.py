@@ -12,10 +12,18 @@ def main():
         theory_feynman.TheoryFeynman: feynman_dir
     }
 
-    agent = rs.RoboScientist(working_dirs)
+    current_dir = os.getcwd()
+    os.chdir(feynman_dir)
+    os.system('./compile.sh')
+    os.chdir(current_dir)
+
+    agent = rs.RoboScientist(working_dirs, keep_full_history=True)
     print('\n\n------------------------------ ENV-1 ------------------------------')
     agent.explore_environment(env_1.Environment1(), theory_feynman.TheoryFeynman, simple_generator.SimpleGenerator)
-    print('\nAnswer:', agent.get_formula_for_theory(theory_feynman.TheoryFeynman))
+    print('\nAnswer:', agent.get_formula_for_exploration_key(rs.ExplorationKey(
+        env=env_1.__name__, theory=theory_feynman.TheoryFeynman.__name__)))
+
+    print(agent.get_full_history())
 
 
 if __name__ == '__main__':

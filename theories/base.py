@@ -20,3 +20,6 @@ class TheoryBase(object):
 
     def get_formula(self):
         return copy(self._formula_string)
+
+    def mse(self):
+        pass

@@ -4,4 +4,6 @@
 *.ipynb_checkpoints
 *.x
 theories/feynman/results/
-
+logs/
+*.log
+theories/feynman/feinman_stdout.txt
