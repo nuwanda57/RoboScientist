@@ -114,7 +114,6 @@ class RoboScientist(object):
         return []
 
     def _update_history(self, key, theory, generator, new_env):
-        # TODO(nuwanda): add condition based on MSE here
         X_test = generator.ask(theory, None)
         y_test = new_env.run_experiments(X_test)
         mse = theory.calculate_test_mse(X_test, y_test)
