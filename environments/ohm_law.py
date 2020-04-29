@@ -1,5 +1,4 @@
 import environments.base as base
-import lib.success_criterion as sc
 import torch
 
 

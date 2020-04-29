@@ -20,6 +20,7 @@ class SimpleGenerator(dg_base.GeneratorBase):
         If no exploration has been made, this should be None.
         :return: Input for the next exploration step.
         """
+        super().ask(theory, previous_exploration_input)
         new_data_size = 2 if previous_exploration_input is None else previous_exploration_input.shape[0] + 1
         if self._env.__class__ == env_1.Environment1:
             return self._env_1_ask(new_data_size)

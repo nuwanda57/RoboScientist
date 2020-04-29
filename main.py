@@ -21,7 +21,7 @@ def main():
     print('\n\n------------------------------ ENV-1 ------------------------------')
     agent.explore_environment(env_1.Environment1(), theory_feynman.TheoryFeynman, simple_generator.SimpleGenerator)
     print('\nAnswer:', agent.get_formula_for_exploration_key(rs.ExplorationKey(
-        env=env_1.__name__, theory=theory_feynman.TheoryFeynman.__name__)))
+        env=env_1.Environment1.__name__, theory=theory_feynman.TheoryFeynman.__name__)))
 
     print(agent.get_full_history())
 

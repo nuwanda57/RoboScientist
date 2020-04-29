@@ -12,6 +12,7 @@ from theories.feynman.aiFeynman import aiFeynman
 
 class TheoryFeynman(base.TheoryBase):
     def train(self, X_train, y_train):
+        super().train(X_train, y_train)
         file_data = np.array([X_train.numpy(), y_train.numpy()]).T
 
         filename = '001.a'
@@ -22,11 +23,14 @@ class TheoryFeynman(base.TheoryBase):
             os.remove(feinman_stdout)
         with open(feinman_stdout, 'a') as f:
             with redirect_stdout(f):
+                self._logger.info('Redirecting stdout into {}'.format(feinman_stdout))
                 aiFeynman('./data/' + filename)
 
         solved_file = open("results/solutions/" + filename + '.txt')
 
-        self._formula_string = solved_file.readlines()[0].split()[1]
+        formula = solved_file.readlines()[0].split()[1]
+        self._logger.info('Resulting formula {}'.format(formula))
+        self._formula_string = formula
         
     def calculate_test_mse(self, X_test, y_test):
         f = copy(self._formula_string)
@@ -37,5 +41,5 @@ class TheoryFeynman(base.TheoryBase):
             pred = [eval(re.sub(r'[^a-zA-Z]x[^a-zA-Z]', str(x.item()), f)) for x in X_test]
             return mean_squared_error(pred, y_test)
         except:
+            self._logger.error('Unable to evaluate formula {}. MSE=1000'.format(self._formula_string))
             return 1000
-#         return None
