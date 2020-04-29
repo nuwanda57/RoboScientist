@@ -24,4 +24,6 @@ class SimpleGenerator(dg_base.GeneratorBase):
         new_data_size = 2 if previous_exploration_input is None else previous_exploration_input.shape[0] + 1
         if self._env.__class__ == env_1.Environment1:
             return self._env_1_ask(new_data_size)
+        if self._env.parameters_count == 1:
+            return 50 * torch.rand(new_data_size)
         return 50 * torch.rand(new_data_size, self._env.parameters_count)

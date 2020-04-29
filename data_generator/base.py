@@ -12,7 +12,7 @@ class GeneratorBase(object):
         :param environment: Environment for which input should be generated.
         """
         self._logger = logger_config.create_logger(self.__class__.__name__)
-        self._logger.info('Creating generator for {}.'.format(environment.__name__))
+        self._logger.info('Creating generator for {}.'.format(environment.__class__.__name__))
         self._env = environment
 
     def ask(self, theory: theories_base.TheoryBase, previous_exploration_input: Optional[torch.tensor]) -> torch.tensor:

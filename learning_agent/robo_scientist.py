@@ -3,7 +3,7 @@ import theories.base as theory_base
 import data_generator.base as gen_base
 from lib import logger as logger_config
 
-from typing import Type, Dict
+from typing import Type, Dict, Optional
 from collections import namedtuple
 from copy import deepcopy
 import os
@@ -51,9 +51,10 @@ class RoboScientist(object):
         key = ExplorationKey(env=new_env.__class__.__name__, theory=theory_class.__name__)
         self._reset_history(key)
         current_dir = os.getcwd()
-        os.chdir(self._working_directories[theory_class])
-        self._logger.info('Current working directory: {}\n\tChanging to {} ...'.format(
-            current_dir, self._working_directories[theory_class]))
+        if theory_class in self._working_directories:
+            os.chdir(self._working_directories[theory_class])
+            self._logger.info('Current working directory: {}\n\tChanging to {} ...'.format(
+                current_dir, self._working_directories[theory_class]))
 
         X_train = None
         generator = generator_class(new_env)
@@ -66,14 +67,21 @@ class RoboScientist(object):
             theory.train(X_train, y_train)
             self._update_history(key, theory, generator, new_env)
 
-        self._logger.info('Current working directory: %s\n\tChanging to %s ...' % (os.getcwd(), current_dir))
-        os.chdir(current_dir)
+        if theory_class in self._working_directories:
+            self._logger.info('Current working directory: %s\n\tChanging to %s ...' % (os.getcwd(), current_dir))
+            os.chdir(current_dir)
         return deepcopy(self._best_results[key])
 
-    def get_formula_for_exploration_key(self, key: ExplorationKey) -> str:
+    def get_formula_for_exploration_key(self, key: ExplorationKey) -> Optional[str]:
         if key in self._best_results:
             return self._best_results[key].get_formula()
         self._logger.warning(('Formula for ({1} environment, {2} theory) pair does not exist. Make sure to explore the '
+                              '{1} environment by using {2} theory').format(key.env, key.theory))
+
+    def get_theory_for_exploration_key(self, key: ExplorationKey) -> Optional[theory_base.TheoryBase]:
+        if key in self._best_results:
+            return self._best_results[key]
+        self._logger.warning(('Theory for ({1} environment, {2} theory) pair does not exist. Make sure to explore the '
                               '{1} environment by using {2} theory').format(key.env, key.theory))
 
     def get_full_history(self):
