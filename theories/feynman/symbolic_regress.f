@@ -71,7 +71,7 @@
 	nn(0)=0
 	nn(1)=0
 	nn(2)=0
-	do i=1,lnblnk(usedfuncs) 
+	do i=1,lnblnk(usedfuncs)
 	  if (usedfuncs(i:i).eq.'D') usedfuncs(i:i)='/'
 	  if (usedfuncs(i:i).eq.'I') usedfuncs(i:i)='\'
 	  j = index(functions,usedfuncs(i:i))
@@ -94,10 +94,10 @@
 	end do
 
 	write(*,'(1a24)') 'Loading mystery data....'
-	call LoadMatrixTranspose(nvarmax+1,nvar+1,nmax,ndata,xy,mysteryfile)	
+	call LoadMatrixTranspose(nvarmax+1,nvar+1,nmax,ndata,xy,mysteryfile)
 	write(*,'(1a24,i8)') 'Number of examples......',ndata
 
-	print *,'Searching for best fit...'	
+	print *,'Searching for best fit...'
 	nformulas = 0
 	minloss = 1.e6
 	template = ''
@@ -146,7 +146,7 @@
 	    write(3,'(1f20.12,x,1a22,1i16,4f19.4)') minloss, ops(1:n), nformulas, rmsloss, DL, DL2, DL3
 	    flush(3)
 	  end if
-	  call multiloop(n,radix,kk,done) 
+	  call multiloop(n,radix,kk,done)
 	end do
 	goto 555
 665	close(3)
@@ -182,7 +182,7 @@
 	      y = 1.
 	    else if (op.eq."P") then
  	      y = 4.*atan(1.) ! pi
-           else 
+           else
     	      y = x(ichar(op)-96)
 	    end if
 	  else if (arity.eq.1) then ! This is a unary function
@@ -223,7 +223,7 @@
 	    end if
           end if
 	  j = j + 1 - arity
-          stack(j) = y  
+          stack(j) = y
 	  ! write(*,'(9f10.5)') (stack(k),k=1,j)
 	end do
 	if (j.ne.1) stop 'DEATH ERROR: STACK UNBALANCED'

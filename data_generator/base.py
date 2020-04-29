@@ -1,5 +1,6 @@
 import environments.base as env_base
 import theories.base as theories_base
+import lib.logger as logger_config
 
 import torch
 from typing import Optional, Type
@@ -10,6 +11,8 @@ class GeneratorBase(object):
         """
         :param environment: Environment for which input should be generated.
         """
+        self._logger = logger_config.create_logger(self.__class__.__name__)
+        self._logger.info('Creating generator for {}.'.format(environment.__class__.__name__))
         self._env = environment
 
     def ask(self, theory: theories_base.TheoryBase, previous_exploration_input: Optional[torch.tensor]) -> torch.tensor:
@@ -19,4 +22,5 @@ class GeneratorBase(object):
         If no exploration has been made, this should be None.
         :return: Input for the next exploration step.
         """
+        self._logger.info('Asking new data.')
         pass

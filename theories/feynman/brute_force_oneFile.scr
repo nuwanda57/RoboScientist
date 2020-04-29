@@ -5,30 +5,31 @@ set opsfile = $1
 set maxtime = $2
 set f = $3
 
+set logfile = brute_force_oneFile.log
 set outfile = brute_solutions.dat
 set outfile2 = brute_formulas.dat
 if -f $outfile /bin/rm $outfile
 if -f $outfile2 /bin/rm $outfile2
 
-echo Trying to solve mysteries with brute force...
+echo Trying to solve mysteries with brute force...  >> $logfile
 
-echo Trying to solve $f...
-echo /bin/cp -p $f mystery.dat
+echo Trying to solve $f...  >> $logfile
+echo /bin/cp -p $f mystery.dat >> $logfile
 /bin/cp -p $f mystery.dat
 echo $opsfile arity2templates.txt mystery.dat results.dat >args.dat
-timeout {$maxtime}s ./symbolic_regress.x  
+timeout {$maxtime}s ./symbolic_regress.x  >> $logfile
 #timeout {$maxtime}s symbolic_regress.x
-python S_get_best_MDL_prefactor.py 
+python S_get_best_MDL_prefactor.py
 
 set accuracy = `cat results.dat | tail -1 | cut -d ' ' -f 4`
-echo '#####ACCURACY: '$accuracy
+echo '#####ACCURACY: '$accuracy  >> $logfile
 set solved = 0
 if ( $accuracy == 0.000000000000) set solved = 1
 echo $f,$accuracy,$solved >>$outfile
 tail -1 results.dat | awk '{print $2}' >> $outfile2
 
 paste -d "," $outfile $outfile2 >brute_results.csv
-echo ALL DONE
+echo ALL DONE  >> $logfile
 
 exit
 

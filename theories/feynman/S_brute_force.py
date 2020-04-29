@@ -24,16 +24,32 @@ def brute_force(pathdir,filename,methods_tried,method_name,BF_try_time,BF_ops_fi
         print("TYPE 2: ",pathdir,filename)
         if use_MDL:
             print('Calling %s' % "./brute_force_oneFile_use_MDL_v2.scr")
+            # with open('feinman_stdout_brute_force.txt', "w") as outfile:
+            #     subprocess.call(
+            #         ["./brute_force_oneFile_use_MDL_v2.scr", file_type, "%s" % try_time, pathdir + filename],
+            #         stdout=outfile)
             subprocess.call(["./brute_force_oneFile_use_MDL_v2.scr", file_type, "%s" %try_time, pathdir+filename])
         else:
             print('Calling %s' % "./brute_force_oneFile_v2.scr")
+            # with open('feinman_stdout_brute_force.txt', "w") as outfile:
+            #     subprocess.call(
+            #         ["./brute_force_oneFile_v2.scr", file_type, "%s" % try_time, pathdir + filename],
+            #         stdout=outfile)
             subprocess.call(["./brute_force_oneFile_v2.scr", file_type, "%s" %try_time, pathdir+filename])
         readable_formulas_from_bruteForce_v1()
     if sep_type==3:
         print("TYPE 3: ",pathdir,filename)
         if use_MDL:
+            # with open('feinman_stdout_brute_force.txt', "w") as outfile:
+            #     subprocess.call(
+            #         ["./brute_force_oneFile_use_MDL_v3.scr", file_type, "%s" % try_time, pathdir + filename],
+            #         stdout=outfile)
             subprocess.call(["./brute_force_oneFile_use_MDL_v3.scr", file_type, "%s" %try_time, pathdir+filename])
         else:
+            # with open('feinman_stdout_brute_force.txt', "w") as outfile:
+            #     subprocess.call(
+            #         ["./brute_force_oneFile_v3.scr", file_type, "%s" % try_time, pathdir + filename],
+            #         stdout=outfile)
             subprocess.call(["./brute_force_oneFile_v3.scr", file_type, "%s" %try_time, pathdir+filename])
         readable_formulas_from_bruteForce_v1()
     if os.stat("bruteformulas.txt").st_size != 0:
@@ -55,6 +71,10 @@ def brute_force(pathdir,filename,methods_tried,method_name,BF_try_time,BF_ops_fi
             print("LOOK FOR PREFACTOR")
             BF_prefactor_unsolved = np.loadtxt("bruteprefactor.txt") # use this if the BF doesn't find an expression for the prefactor
             print("BF_prefactor_unsolved: ", BF_prefactor_unsolved)
+            # with open('feinman_stdout_brute_force.txt', "w") as outfile:
+            #     subprocess.call(
+            #         ["./brute_force_oneFile.scr", file_type, "%s" % try_time_prefactor, "bruteprefactor.txt"],
+            #         stdout=outfile)
             subprocess.call(["./brute_force_oneFile.scr", file_type, "%s" %try_time_prefactor, "bruteprefactor.txt"])
             readable_formulas_from_bruteForce_v2()
             if os.stat("bruteformulas.txt").st_size == 0:
