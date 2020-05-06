@@ -7,8 +7,8 @@ import config
 def create_logger(name):
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
-    if not os.path.exists(config.LOGS_PATH):
-        os.mkdir(config.LOGS_PATH)
+    if not os.path.exists(config.LOGS_FOLDER_PATH):
+        os.mkdir(config.LOGS_FOLDER_PATH)
     fh = logging.FileHandler(config.LOGS_PATH)
     fh.setLevel(logging.INFO)
     ch = logging.StreamHandler()
