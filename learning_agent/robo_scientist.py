@@ -5,7 +5,6 @@ from lib import logger as logger_config
 
 from typing import Type, Dict, Optional
 from collections import namedtuple
-from copy import deepcopy
 import os
 
 
@@ -67,7 +66,7 @@ class RoboScientist(object):
         if theory_class in self._working_directories:
             self._logger.info('Current working directory: %s\n\tChanging to %s ...' % (os.getcwd(), current_dir))
             os.chdir(current_dir)
-        return deepcopy(self._best_results[key])
+        return (self._best_results[key])
 
     def get_formula_for_exploration_key(self, key: ExplorationKey) -> Optional[str]:
         if key in self._best_results:
@@ -83,7 +82,7 @@ class RoboScientist(object):
 
     def get_full_history(self):
         if self._keep_full_history:
-            return deepcopy(self._history)
+            return (self._history)
         self._logger.warning(('keep_full_history parameter is set to False: no history tracking. To start tracking '
                               'history make sure to set keep_full_history to True.'))
         return None
@@ -91,7 +90,7 @@ class RoboScientist(object):
     def get_history_for_exploration_key(self, key):
         if self._keep_full_history:
             if key in self._history:
-                return deepcopy(self._history[key])
+                return (self._history[key])
             self._logger.warning('No history is found for ({}, {}) pair.'.format(key.env, key.theory))
             return []
         self._logger.warning(('keep_full_history parameter is set to False: no history tracking. To start tracking '
@@ -107,7 +106,7 @@ class RoboScientist(object):
         if old_theory is None:
             self._logger.info('Setting best theory for ({}, {}) pair. MSE: {}, FORMULA: {}'.format(
                 key.env, key.theory, mse, formula))
-            self._best_results[key] = deepcopy(theory)
+            self._best_results[key] = (theory)
         else:
             old_mse = old_theory.calculate_test_mse(X_test, y_test)
             old_formula = old_theory.get_formula()
@@ -125,7 +124,7 @@ class RoboScientist(object):
                     ('GREAT NEWS!! The new result is better than the previous one for ({}, {}) pair.'
                      'Updating theory: previous MSE: {}, new MSE: {}, old formula: {},'
                      'NEW FORMULA: {}').format(key.env, key.theory, old_mse, mse, old_formula, formula))
-                self._best_results[key] = deepcopy(theory)
+                self._best_results[key] = (theory)
         if self._keep_full_history:
             if key not in self._history:
                 self._logger.critical('The key for ({}, {}) pair is not found in history.'.format(key.env, key.theory))
