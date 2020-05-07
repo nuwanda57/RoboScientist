@@ -40,8 +40,9 @@ class TheoryFeynman(base.TheoryBase):
         self._logger.info('Trying to evaluate formula: {}.'.format(
             re.sub(r'[^a-zA-Z]x[^a-zA-Z]', str(X_test[0].item()), f)))
         try:
-            pred = [eval(re.sub(r'[^a-zA-Z]x[^a-zA-Z]', str(x.item()), f)) for x in X_test]
+            pred = [eval(re.sub(r'[^a-zA-Z]x[^a-zA-Z]', str(x.item()), f)) for x in X_test[99]]
             return mean_squared_error(pred, y_test)
-        except:
+        except Exception as error:
             self._logger.error('Unable to evaluate formula {}. MSE=1000'.format(self._formula_string))
+            self._logger.error('Exception raised: {}'.format(str(error)))
             return 1000
