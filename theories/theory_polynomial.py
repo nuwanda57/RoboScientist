@@ -33,3 +33,7 @@ class TheoryPolynomial(base.TheoryBase):
     def calculate_test_mse(self, X_test, y_test):
         super().calculate_test_mse(X_test, y_test)
         return None
+
+    def __deepcopy__(self, memodict={}):
+        # TODO(nuwanda): implement
+        pass
