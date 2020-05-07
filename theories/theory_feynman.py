@@ -37,6 +37,8 @@ class TheoryFeynman(base.TheoryBase):
         f = f.replace('sqrt', 'np.sqrt').replace('exp', 'np.exp')\
             .replace('pi', 'np.pi').replace('sin', 'np.sin').replace('log', 'np.log')
 
+        self._logger.info('Trying to evaluate formula: {}.'.format(
+            re.sub(r'[^a-zA-Z]x[^a-zA-Z]', str(X_test[0].item()), f)))
         try:
             pred = [eval(re.sub(r'[^a-zA-Z]x[^a-zA-Z]', str(x.item()), f)) for x in X_test]
             return mean_squared_error(pred, y_test)
