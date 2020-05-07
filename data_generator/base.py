@@ -1,6 +1,6 @@
 import environments.base as env_base
 import theories.base as theories_base
-import lib.logger as logger_config
+import logging
 
 import torch
 from typing import Optional, Type
@@ -11,7 +11,7 @@ class GeneratorBase(object):
         """
         :param environment: Environment for which input should be generated.
         """
-        self._logger = logger_config.create_logger(self.__class__.__name__)
+        self._logger = logging.getLogger('rs.%s' % self.__class__.__name__)
         self._logger.info('Creating generator for {}.'.format(environment.__class__.__name__))
         self._env = environment
 
