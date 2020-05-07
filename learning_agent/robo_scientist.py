@@ -19,16 +19,13 @@ class RoboScientist(object):
     """
     def __init__(self,
                  working_directories: Dict[Type[theory_base.TheoryBase], str],
-                 logger=None,
                  keep_full_history: bool=False):
         """
         :param working_directories: Mapping from theory classes to working directory.
         Current directory will be changed accordingly.
         :param keep_full_history: whether to keep the full history for each (env, theory) pair or not
         """
-        self._logger = logger
-        if self._logger is None:
-            self._logger = logger_config.create_logger(self.__class__.__name__)
+        self._logger = logger_config.create_logger('rs')
         self._best_results = {}  # Dict[Tuple[Type[env_base.EnvironmentBase], Type[theory_base.TheoryBase]], theory_base.TheoryBase]
         self._logger.info(('Creating RoboScientist object with the following configurations:\n'
                            'working directories: {}\nkeep_full_history: {}').format(working_directories, keep_full_history))

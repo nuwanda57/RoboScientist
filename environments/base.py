@@ -10,7 +10,7 @@ class EnvironmentBase(object):
         """
         :param parameters_count: Number of variables that have to be passed to experiments.
         """
-        self._logger = logging.getLogger('Environment logger')
+        self._logger = logging.getLogger('rs.%s' % self.__class__.__name__)
         self.parameters_count = parameters_count
 
     def run_experiments(self, input_data: torch.Tensor) -> torch.Tensor:

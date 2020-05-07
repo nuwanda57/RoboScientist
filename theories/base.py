@@ -1,5 +1,5 @@
 from copy import deepcopy, copy
-from lib import logger as logger_config
+import logging
 
 
 class TheoryBase(object):
@@ -7,7 +7,7 @@ class TheoryBase(object):
         """
         :param params_cnt:
         """
-        self._logger = logger_config.create_logger(self.__class__.__name__)
+        self._logger = logging.getLogger('rs.%s' % self.__class__.__name__)
         self._logger.info('Creating {} object with params_cnt={}'.format(self.__class__.__name__, params_cnt))
         self._params_cnt = params_cnt
         self._formula_string = ''
