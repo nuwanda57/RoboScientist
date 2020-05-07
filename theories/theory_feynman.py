@@ -1,10 +1,10 @@
-import numpy as np
-import sys
 import os
-from copy import copy
-from contextlib import redirect_stdout
-from sklearn.metrics import mean_squared_error
 import re
+from contextlib import redirect_stdout
+from copy import copy
+
+import numpy as np
+from sklearn.metrics import mean_squared_error
 
 from theories import base
 from theories.feynman.aiFeynman import aiFeynman
@@ -31,10 +31,10 @@ class TheoryFeynman(base.TheoryBase):
         formula = solved_file.readlines()[0].split()[1]
         self._logger.info('Resulting formula {}'.format(formula))
         self._formula_string = formula
-        
+
     def calculate_test_mse(self, X_test, y_test):
         f = copy(self._formula_string)
-        f = f.replace('sqrt', 'np.sqrt').replace('exp', 'np.exp')\
+        f = f.replace('sqrt', 'np.sqrt').replace('exp', 'np.exp') \
             .replace('pi', 'np.pi').replace('sin', 'np.sin').replace('log', 'np.log')
 
         self._logger.info('Trying to evaluate formula: {}.'.format(

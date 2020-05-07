@@ -3,9 +3,9 @@ import theories.base as theory_base
 import data_generator.base as gen_base
 from lib import logger as logger_config
 
+from copy import deepcopy
 from typing import Type, Dict, Optional
 from collections import namedtuple
-from copy import deepcopy
 import os
 
 
