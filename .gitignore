@@ -8,3 +8,8 @@ logs/
 *.log
 config.py
 theories/feynman/feinman_stdout.txt
+theories/feynman/brute_constant.dat
+theories/feynman/bruteprefactor.txt
+theories/feynman/data/001.a
+theories/feynman/mystery.dat
+theories/feynman/results.dat
