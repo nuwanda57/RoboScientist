@@ -10,7 +10,10 @@ import torch.nn as nn
 
 
 class TheoryNestedFormula(base.TheoryBase):
-
+    def __init__(self, *args):
+        super(TheoryNestedFormula, self).__init__(*args)
+        self.predictor = None
+        
     def train(self, X, y, optimizer_for_formula=torch.optim.Adam, device=torch.device("cpu"), n_init=1,
               max_iter=100,
               lr=0.01,
@@ -53,6 +56,7 @@ class TheoryNestedFormula(base.TheoryBase):
                 loss values for best initialization
         """
         super().train(X, y)
+        
         if X.ndim == 1:
             X = X.reshape(-1, 1)
         y = y.reshape(-1, 1)
@@ -107,11 +111,14 @@ class TheoryNestedFormula(base.TheoryBase):
                 break
 
         formula = str(best_formula)
-        self.inner_nested_formula = best_formula
+        print(formula)
+        self.predictor = best_formula
+        print(self.predictor)
         self._logger.info('Resulting formula {}'.format(formula))
         self._formula_string = formula
 
 
-def calculate_test_mse(self, X_test, y_test):
-    y_pred = self.inner_nested_formula.forward(X_test).detach()
-    return mean_squared_error(y_test, y_pred)
+    def calculate_test_mse(self, X_test, y_test):
+        print("predictor", self.predictor)
+        y_pred = self.predictor.forward(X_test).detach()
+        return mean_squared_error(y_pred, y_test)
