@@ -7,7 +7,6 @@ from theories.nested_formulas.nested_formula import NestedFormula
 
 import torch
 import torch.nn as nn
-# from auxiliary_functions import *
 
 
 class TheoryNestedFormula(base.TheoryBase):

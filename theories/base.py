@@ -30,6 +30,6 @@ class TheoryBase(object):
         pass
 
     def __deepcopy__(self, memodict={}):
-        new_obj = TheoryBase(self._params_cnt)
+        new_obj = self.__class__(self._params_cnt)
         new_obj._formula_string = self._formula_string
         return new_obj

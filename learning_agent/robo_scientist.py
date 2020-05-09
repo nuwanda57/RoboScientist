@@ -103,6 +103,8 @@ class RoboScientist(object):
         y_test = new_env.run_experiments(X_test)
         mse = theory.calculate_test_mse(X_test, y_test)
         formula = theory.get_formula()
+        self._logger.info('new MSE: {}'.format(mse))
+        self._logger.info('new formula: {}'.format(formula))
         old_theory = self._best_results[key]
         if old_theory is None:
             self._logger.info('Setting best theory for ({}, {}) pair. MSE: {}, FORMULA: {}'.format(
@@ -111,6 +113,8 @@ class RoboScientist(object):
         else:
             old_mse = old_theory.calculate_test_mse(X_test, y_test)
             old_formula = old_theory.get_formula()
+            self._logger.info('old MSE: {}'.format(old_mse))
+            self._logger.info('old formula: {}'.format(old_formula))
             if old_formula == formula:
                 self._logger.info(
                     ('Learnt formula is exactly the same as the previous one for ({}, {}) pair.'
