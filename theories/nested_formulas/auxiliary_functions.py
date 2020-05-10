@@ -14,17 +14,17 @@ def descriptive_length_of_real_number(real_number, precision_floor=1e-8):
     return logplus(real_number / torch.tensor(precision_floor))
 
 
-def FormFractionRepresentation(fraction: torch.tensor) -> str:
+def form_fraction_representation(fraction: torch.tensor) -> str:
     if fraction[1].item() != 1:
         return r"\frac{" + str(int(fraction[0].item())) + "}{" + str(int(fraction[1].item())) + "}"
     return str(int(fraction[0].item()))
 
 
-def FormReal(number: torch.tensor) -> str:
+def form_real(number: torch.tensor) -> str:
     return "{:.3f}".format(number.item())
 
 
-def AddRationalInName(name: str) -> str:
+def add_rational_in_name(name: str) -> str:
     if 'lambda' in name:
         position = name.find('lambda')
     else:
@@ -37,7 +37,7 @@ def info(formula):
         formula.depth, formula.num_variables, len(formula.parameters)))
 
 
-def PrintFormula(formula, mode="slow"):
+def print_formula(formula, mode="slow"):
     #     info(network)
     if mode == "slow":
         display(Math(str(formula)))

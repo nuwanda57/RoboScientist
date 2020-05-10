@@ -1,4 +1,3 @@
-from copy import deepcopy, copy
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
@@ -7,7 +6,7 @@ from theories.polynomial import builder as polynomial_builder
 
 
 class TheoryPolynomial(base.TheoryBase):
-    def __init__(self, params_cnt: int = 1, polynomial_type: str = 'Chebyshev', polynomial_cnt : int = 10):
+    def __init__(self, params_cnt: int = 1, polynomial_type: str = 'Chebyshev', polynomial_cnt: int = 10):
         """
         :param params_cnt:
         :param polynomial_type: Polynomial type.

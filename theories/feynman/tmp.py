@@ -1,5 +1,6 @@
 import baselines.ai_feynman.main as baseline
-from environments import ohm_law, single_param_linear_law, universal_gravitation, env_1
+
+from environments import env_1
 
 
 def main():
@@ -14,7 +15,6 @@ def main():
 
     print('\n\n------------------------------Env-1\'s Law------------------------------')
     agent.explore_environment(env_1.Environment1()).show_formula()
-
 
 
 if __name__ == '__main__':

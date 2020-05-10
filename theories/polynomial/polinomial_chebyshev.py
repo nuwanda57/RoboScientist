@@ -16,5 +16,5 @@ class ChebyshevPolynomial(base.PolynomialBase):
             return 0
         if n == 1:
             return 1
-        return 2 * x * ChebyshevPolynomial.d_p(x, n - 1) +\
-                2 * ChebyshevPolynomial.p(x, n - 1) - ChebyshevPolynomial.d_p(x, n - 2)
+        return 2 * x * ChebyshevPolynomial.d_p(x, n - 1) + \
+               2 * ChebyshevPolynomial.p(x, n - 1) - ChebyshevPolynomial.d_p(x, n - 2)

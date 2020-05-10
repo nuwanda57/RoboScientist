@@ -1,19 +1,18 @@
-import torch
-from sklearn.metrics import mean_squared_error
-
-from theories import base
-from theories.nested_formulas.nested_formula import NestedFormula
-
+import pickle
 
 import torch
 import torch.nn as nn
+from sklearn.metrics import mean_squared_error
+
+from theories import base
+from theories.nested_formulas.nested_formula import NestedFormula, print_formula
 
 
 class TheoryNestedFormula(base.TheoryBase):
     def __init__(self, *args):
         super(TheoryNestedFormula, self).__init__(*args)
-        self.predictor = None
-        
+        self._model = None
+
     def train(self, X, y, optimizer_for_formula=torch.optim.Adam, device=torch.device("cpu"), n_init=1,
               max_iter=100,
               lr=0.01,
@@ -48,27 +47,20 @@ class TheoryNestedFormula(base.TheoryBase):
                 the learning process will be finished
             max_tol: float
                 if the loss becomes smaller than this value, stop performing initializations and finish the learning process
-
-        Returns:
-            best_formula: RecursiveFormula
-                fitted formula
-            best_losses: list of float
-                loss values for best initialization
         """
         super().train(X, y)
-        
+
         if X.ndim == 1:
             X = X.reshape(-1, 1)
         y = y.reshape(-1, 1)
         m = X.shape[1]
-        best_formula = NestedFormula(depth, m).to(device)
+        best_model = NestedFormula(depth, m).to(device)
         best_loss = 1e20
-        best_losses = []
 
         for init in range(n_init):
             losses = []
             if verbose > 0:
-                print("  Initialization #{}".format(init + 1))
+                self._logger.info("  Initialization #{}".format(init + 1))
             #     torch.random.manual_seed(seed)
             model = NestedFormula(depth, m).to(device)
 
@@ -88,8 +80,8 @@ class TheoryNestedFormula(base.TheoryBase):
                 losses.append(loss.item())
                 loss.backward()
                 if verbose == 2 and (epoch + 1) % verbose_frequency == 0:
-                    print("    Epoch {}, current loss {:.3}, current formula ".format(epoch + 1, loss.item()), end='')
-                    PrintFormula(model, "fast")
+                    self._logger.info("    Epoch {}, current loss {:.3}, current formula ".format(epoch + 1, loss.item()), end='')
+                    self._logger.info(model)
                 optimizer.step()
                 epoch += 1
                 if torch.abs(previous_loss - loss) < minimal_acceptable_improvement:
@@ -98,27 +90,30 @@ class TheoryNestedFormula(base.TheoryBase):
                     epochs_without_improvement = 0
                 previous_loss = loss.item()
                 if epoch == 1000 and loss > 1e5:
-                    print("  The model does not seem to converge, finishing at epoch 1000")
+                    self._logger.info("  The model does not seem to converge, finishing at epoch 1000")
                     epoch = max_iter
             if loss < best_loss:
                 best_loss = loss
-                best_formula = model
-                best_losses = losses
+                best_model = model
             if verbose > 0:
-                print("  Finished run #{}, loss {}, best loss {}".format(init + 1, loss, best_loss))
+                self._logger.info("  Finished run #{}, loss {}, best loss {}".format(init + 1, loss, best_loss))
             if loss < max_tol:
-                print(f'loss is smaller than {max_tol}, terminating learning process')
+                self._logger.info(f'loss is smaller than {max_tol}, terminating learning process')
                 break
 
-        formula = str(best_formula)
-        print(formula)
-        self.predictor = best_formula
-        print(self.predictor)
+        formula = str(best_model)
+        self._model = best_model
         self._logger.info('Resulting formula {}'.format(formula))
         self._formula_string = formula
 
-
     def calculate_test_mse(self, X_test, y_test):
-        print("predictor", self.predictor)
-        y_pred = self.predictor.forward(X_test).detach()
+        if self._model is None:
+            self._logger.info('Theory is not trained.')
+            return 1000
+        y_pred = self._model.forward(X_test).detach()
         return mean_squared_error(y_pred, y_test)
+
+    def __deepcopy__(self, memodict={}):
+        new_obj = super().__deepcopy__(memodict)
+        new_obj.predictor = pickle.loads(pickle.dumps(self._model))
+        return new_obj

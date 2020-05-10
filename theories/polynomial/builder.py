@@ -1,9 +1,8 @@
-import types
 import functools
+import types
 
 from theories.polynomial import polinomial_chebyshev as chebyshev
 from theories.polynomial import polynomial_fourier as fourier
-
 
 _INF = 100000
 
@@ -44,13 +43,11 @@ class PolynomialBuilder(object):
     def list_available(cls):
         print(cls._AVAILABLE_TYPES)
 
-
     @classmethod
     def get_polynomial_by_type(cls, ptype):
         if ptype in cls._POLYNOMIAL_HOLDER:
             return cls._POLYNOMIAL_HOLDER[ptype]
         raise UnknownPolynomialError
-
 
     @classmethod
     def get_polynomial_sets_by_type(cls, ptype):
@@ -98,7 +95,7 @@ class PolynomialBuilder(object):
             if d_ind == 0:
                 P_polynoms.append(cls._polynomial_builder_for_2d_function(deg, True, polynom_cls.d_p))
                 P_polynoms.append(lambda x1, x2: 0)
-            else: # d_ind == 1
+            else:  # d_ind == 1
                 P_polynoms.append(lambda x1, x2: 0)
                 P_polynoms.append(cls._polynomial_builder_for_2d_function(deg, False, polynom_cls.d_p))
 

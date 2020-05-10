@@ -1,21 +1,15 @@
 from __future__ import print_function
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-from torchvision import datasets, transforms
-import pandas as pd
-import numpy as np
-import torch
 from torch.utils import data
-import pickle
-from torch.optim.lr_scheduler import CosineAnnealingLR
-from matplotlib import pyplot as plt
-import time
 
 is_cuda = torch.cuda.is_available()
 
 bs = 2048
+
 
 class MultDataset(data.Dataset):
     def __init__(self, factors, product):
@@ -34,29 +28,30 @@ class MultDataset(data.Dataset):
 
         return x, y
 
+
 def rmse_loss(pred, targ):
-    denom = targ**2
-    denom = torch.sqrt(denom.sum()/len(denom))
+    denom = targ ** 2
+    denom = torch.sqrt(denom.sum() / len(denom))
 
-    return torch.sqrt(F.mse_loss(pred, targ))/denom
+    return torch.sqrt(F.mse_loss(pred, targ)) / denom
 
 
-def NN_eval(pathdir,filename):
+def NN_eval(pathdir, filename):
     try:
-        n_variables = np.loadtxt(pathdir+filename, dtype='str').shape[1]-1
-        variables = np.loadtxt(pathdir+filename, usecols=(0,))
+        n_variables = np.loadtxt(pathdir + filename, dtype='str').shape[1] - 1
+        variables = np.loadtxt(pathdir + filename, usecols=(0,))
 
-        if n_variables==0:
+        if n_variables == 0:
             return 0
-        elif n_variables==1:
-            variables = np.reshape(variables,(len(variables),1))
+        elif n_variables == 1:
+            variables = np.reshape(variables, (len(variables), 1))
         else:
-            for j in range(1,n_variables):
-                v = np.loadtxt(pathdir+filename, usecols=(j,))
-                variables = np.column_stack((variables,v))
+            for j in range(1, n_variables):
+                v = np.loadtxt(pathdir + filename, usecols=(j,))
+                variables = np.column_stack((variables, v))
 
-        f_dependent = np.loadtxt(pathdir+filename, usecols=(n_variables,))
-        f_dependent = np.reshape(f_dependent,(len(f_dependent),1))
+        f_dependent = np.loadtxt(pathdir + filename, usecols=(n_variables,))
+        f_dependent = np.reshape(f_dependent, (len(f_dependent), 1))
 
         factors = torch.from_numpy(variables[0:100000])
         if is_cuda:
@@ -91,9 +86,9 @@ def NN_eval(pathdir,filename):
                 self.linear2 = nn.Linear(128, 128)
                 self.linear3 = nn.Linear(128, 128)
                 self.linear4 = nn.Linear(128, 64)
-                self.linear5 = nn.Linear(64,64)
-                self.linear6 = nn.Linear(64,64)
-                self.linear7 = nn.Linear(64,1)
+                self.linear5 = nn.Linear(64, 64)
+                self.linear6 = nn.Linear(64, 64)
+                self.linear7 = nn.Linear(64, 1)
 
             def forward(self, x):
                 x = F.softplus(self.linear1(x))
@@ -109,15 +104,11 @@ def NN_eval(pathdir,filename):
             model = SimpleNet(n_variables).cuda()
         else:
             model = SimpleNet(n_variables)
-        
-        model.load_state_dict(torch.load("results/NN_trained_models/models/"+filename+".h5"))
+
+        model.load_state_dict(torch.load("results/NN_trained_models/models/" + filename + ".h5"))
         model.eval()
-        return(rmse_loss(model(factors_val),product_val))
+        return (rmse_loss(model(factors_val), product_val))
 
     except Exception as e:
         print(e)
         return (100)
-
-
-
-

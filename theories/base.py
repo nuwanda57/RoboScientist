@@ -1,5 +1,5 @@
-from copy import deepcopy, copy
 import logging
+from copy import copy
 
 
 class TheoryBase(object):

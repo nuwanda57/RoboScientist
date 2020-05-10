@@ -1,10 +1,10 @@
 # this function gets the reduced variables for a given equation e.g. u/v, m2/m1 etc.
 
 import pandas as pd
-import sympy as sp
 from sympy.parsing.sympy_parser import parse_expr
 
-def replace_variables(input_file,filename,formula):
+
+def replace_variables(input_file, filename, formula):
     # clean weird things in the formula such as Pi -> pi not to be seen as a variable
     formula = str(formula)
     formula = formula.replace("Pi", "pi")
@@ -24,55 +24,53 @@ def replace_variables(input_file,filename,formula):
     vars = []
     for i in range(len(dimRed_filename)):
         if dimRed_filename[i] == filename:
-            if pd.isnull(var1[i])==0:
-                if var1[i][0]!=" ":
-                    if var1[i]!='':
+            if pd.isnull(var1[i]) == 0:
+                if var1[i][0] != " ":
+                    if var1[i] != '':
                         vars = vars + [var1[i]]
                 else:
-                    if var1[i][1:]!='':
+                    if var1[i][1:] != '':
                         vars = vars + [var1[i][1:]]
-            if pd.isnull(var2[i])==0:
-                if var2[i][0]!=" ":
-                    if var2[i]!='':
+            if pd.isnull(var2[i]) == 0:
+                if var2[i][0] != " ":
+                    if var2[i] != '':
                         vars = vars + [var2[i]]
-                else:   
-                    if var2[i][1:]!='':
+                else:
+                    if var2[i][1:] != '':
                         vars = vars + [var2[i][1:]]
-            if pd.isnull(var3[i])==0:
-                if var3[i][0]!=" ":
-                    if var3[i]!='':
+            if pd.isnull(var3[i]) == 0:
+                if var3[i][0] != " ":
+                    if var3[i] != '':
                         vars = vars + [var3[i]]
                 else:
-                    if var3[i][1:]!='':
+                    if var3[i][1:] != '':
                         vars = vars + [var3[i][1:]]
-            if pd.isnull(var4[i])==0:
-                if var4[i][0]!=" ":
-                    if var4[i]!='':
+            if pd.isnull(var4[i]) == 0:
+                if var4[i][0] != " ":
+                    if var4[i] != '':
                         vars = vars + [var4[i]]
                 else:
-                    if var4[i][1:]!='':
+                    if var4[i][1:] != '':
                         vars = vars + [var4[i][1:]]
-            if pd.isnull(var5[i])==0:
-                if var5[i][0]!=" ":
-                    if var5[i]!='':
+            if pd.isnull(var5[i]) == 0:
+                if var5[i][0] != " ":
+                    if var5[i] != '':
                         vars = vars + [var5[i]]
                 else:
-                    if var5[i][1:]!='':
+                    if var5[i][1:] != '':
                         vars = vars + [var5[i][1:]]
-            if pd.isnull(var6[i])==0:
-                if var6[i][0]!=" ":
-                    if var6[i]!='':
+            if pd.isnull(var6[i]) == 0:
+                if var6[i][0] != " ":
+                    if var6[i] != '':
                         vars = vars + [var6[i]]
                 else:
-                    if var6[i][1:]!='':
+                    if var6[i][1:] != '':
                         vars = vars + [var6[i][1:]]
             break
 
-
     # get the discovered symbols and repalce them with the original ones
-    discovered_symbols = sorted(formula.free_symbols, key = lambda symbol: symbol.name)
+    discovered_symbols = sorted(formula.free_symbols, key=lambda symbol: symbol.name)
     for i in range(len(vars)):
-        formula = formula.subs(discovered_symbols[i], "("+vars[i]+")")
+        formula = formula.subs(discovered_symbols[i], "(" + vars[i] + ")")
 
     return formula
-

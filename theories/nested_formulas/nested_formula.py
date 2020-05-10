@@ -146,7 +146,7 @@ class NestedFormula(nn.Module):
                         simplified_version_for_iteration.load_state_dict(simplified_state_dict)
                     else:
                         # If we are successful, we update everything
-                        simplified_state_dict[AddRationalInName(key)] = torch.tensor(
+                        simplified_state_dict[add_rational_in_name(key)] = torch.tensor(
                             [simplified_parameter_numerator, possible_denominator])
                         simplified_version.load_state_dict(simplified_state_dict)
                         simplified_version_for_iteration = copy.deepcopy(simplified_version)
@@ -178,8 +178,8 @@ class NestedFormula(nn.Module):
         """
         if self.depth == 0:
             if self.get_rational_lambda(0)[1] > 0:  # if it is equal to 0, it means that there is no rational value
-                return FormFractionRepresentation(self.get_rational_lambda(0))
-            return FormReal(self.get_lambda(0))
+                return form_fraction_representation(self.get_rational_lambda(0))
+            return form_real(self.get_lambda(0))
 
         ans = ["\left("]
         for i in range(self.num_variables):
@@ -187,15 +187,15 @@ class NestedFormula(nn.Module):
             if i != 0 and self.get_lambda(i) > 0:
                 ans.append(" + ")
             if self.get_rational_lambda(i)[1] > 0:
-                ans.append(FormFractionRepresentation(self.get_rational_lambda(i)))
+                ans.append(form_fraction_representation(self.get_rational_lambda(i)))
             else:
-                ans.append(FormReal(self.get_lambda(i)))
+                ans.append(form_real(self.get_lambda(i)))
                 # Then we add variable and its power
             ans.append("x_{}^".format(i + 1) + "{")
             if self.get_rational_power(i)[1] > 0:
-                ans.append(FormFractionRepresentation(self.get_rational_power(i)))
+                ans.append(form_fraction_representation(self.get_rational_power(i)))
             else:
-                ans.append(FormReal(self.get_power(i)))
+                ans.append(form_real(self.get_power(i)))
             ans += "}"
             # Then we add the corresponding subformula
             if self.depth != 1:

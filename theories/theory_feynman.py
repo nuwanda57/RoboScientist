@@ -44,9 +44,8 @@ class TheoryFeynman(base.TheoryBase):
     def calculate_test_mse(self, X_test, y_test):
         f = copy(self._formula_string)
 
-        f = f.replace('sqrt', 'np.sqrt').replace('exp', 'np.exp')\
+        f = f.replace('sqrt', 'np.sqrt').replace('exp', 'np.exp') \
             .replace('pi', 'np.pi').replace('sin', 'np.sin').replace('log', 'np.log').replace('cos', 'np.cos')
-
 
         self._logger.info('Trying to evaluate formula: {}.'.format(
             re.sub(r'([^a-zA-Z])x([^a-zA-Z])', r'\1 %f \2' % X_test[0].item(), f)))
@@ -60,7 +59,7 @@ class TheoryFeynman(base.TheoryBase):
                 return 1000
             self._logger.info('MSE: {}'.format(mse))
             self._logger.info('HERE2!!!')
-          
+
             return mse
         except Exception as error:
             self._logger.error('Unable to evaluate formula {}. MSE=1000'.format(self._formula_string))
