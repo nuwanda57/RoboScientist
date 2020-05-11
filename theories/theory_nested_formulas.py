@@ -5,7 +5,7 @@ import torch.nn as nn
 from sklearn.metrics import mean_squared_error
 
 from theories import base
-from theories.nested_formulas.nested_formula import NestedFormula, print_formula
+from theories.nested_formulas.nested_formula import NestedFormula
 
 
 class TheoryNestedFormula(base.TheoryBase):
@@ -61,7 +61,6 @@ class TheoryNestedFormula(base.TheoryBase):
             losses = []
             if verbose > 0:
                 self._logger.info("  Initialization #{}".format(init + 1))
-            #     torch.random.manual_seed(seed)
             model = NestedFormula(depth, m).to(device)
 
             criterion = nn.MSELoss()
@@ -80,7 +79,7 @@ class TheoryNestedFormula(base.TheoryBase):
                 losses.append(loss.item())
                 loss.backward()
                 if verbose == 2 and (epoch + 1) % verbose_frequency == 0:
-                    self._logger.info("    Epoch {}, current loss {:.3}, current formula ".format(epoch + 1, loss.item()), end='')
+                    self._logger.info("\t\tEpoch {}, current loss {:.3}, current formula ".format(epoch + 1, loss.item()), end='')
                     self._logger.info(model)
                 optimizer.step()
                 epoch += 1
@@ -90,13 +89,13 @@ class TheoryNestedFormula(base.TheoryBase):
                     epochs_without_improvement = 0
                 previous_loss = loss.item()
                 if epoch == 1000 and loss > 1e5:
-                    self._logger.info("  The model does not seem to converge, finishing at epoch 1000")
+                    self._logger.info("\tThe model does not seem to converge, finishing at epoch 1000")
                     epoch = max_iter
             if loss < best_loss:
                 best_loss = loss
                 best_model = model
             if verbose > 0:
-                self._logger.info("  Finished run #{}, loss {}, best loss {}".format(init + 1, loss, best_loss))
+                self._logger.info("\tFinished run #{}, loss {}, best loss {}".format(init + 1, loss, best_loss))
             if loss < max_tol:
                 self._logger.info(f'loss is smaller than {max_tol}, terminating learning process')
                 break

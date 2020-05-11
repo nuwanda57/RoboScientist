@@ -1,55 +1,65 @@
+import numpy as np
 import os
 import shutil
-import time
-
-import numpy as np
-import pandas as pd
-from sympy import *
-from sympy.parsing.sympy_parser import parse_expr
-
-from theories.feynman.S_NN_equal_vars import NN_equal_vars
-from theories.feynman.S_NN_eval import NN_eval
-from theories.feynman.S_NN_sep_add import NN_sep_add
+import subprocess
+from subprocess import call
+from theories.feynman.S_multipolyfit import getBest
+import sys
+import csv
+from theories.feynman.S_polyclean_file import polyfit
 from theories.feynman.S_NN_sep_mult import NN_sep_mult
-from theories.feynman.S_NN_train import NN_train
-from theories.feynman.S_change_input import input_acos
-from theories.feynman.S_change_input import input_asin
-from theories.feynman.S_change_input import input_atan
-from theories.feynman.S_change_input import input_cos
-from theories.feynman.S_change_input import input_divide_2
-from theories.feynman.S_change_input import input_exp
-from theories.feynman.S_change_input import input_inverse
-from theories.feynman.S_change_input import input_log
-from theories.feynman.S_change_input import input_multiply_2
-from theories.feynman.S_change_input import input_sin
-from theories.feynman.S_change_input import input_sqrt
-from theories.feynman.S_change_input import input_squared
-from theories.feynman.S_change_input import input_tan
-from theories.feynman.S_create_new_file_for_NN_add import create_new_file_for_NN_add
-from theories.feynman.S_create_new_file_for_NN_eq_vars import create_new_file_for_NN_eq_vars
-from theories.feynman.S_create_new_file_for_NN_mult import create_new_file_for_NN_mult
-from theories.feynman.S_create_variables_file import create_variables_file
-from theories.feynman.S_generate_new_dimRed_xlsx_file_equal_vars import generate_new_dimRed_xlsx_file_equal_vars
-from theories.feynman.S_generate_new_dimRed_xlsx_file_separable import generate_new_dimRed_xlsx_file_separable
-from theories.feynman.S_generate_new_dimRed_xlsx_file_transf_input import generate_new_dimRed_xlsx_file_transf_input
-from theories.feynman.S_generate_new_dimRed_xlsx_file_translation import generate_new_dimRed_xlsx_file_translation
-from theories.feynman.S_get_RMS import get_RMS
-from theories.feynman.S_get_acos import get_acos
-from theories.feynman.S_get_asin import get_asin
-from theories.feynman.S_get_atan import get_atan
-from theories.feynman.S_get_cos import get_cos
-from theories.feynman.S_get_exp import get_exp
+from theories.feynman.S_NN_sep_add import NN_sep_add
+from theories.feynman.S_NN_equal_vars import NN_equal_vars
+from theories.feynman.S_brute_force import brute_force
 from theories.feynman.S_get_inverse import get_inverse
 from theories.feynman.S_get_log import get_log
+from theories.feynman.S_get_exp import get_exp
 from theories.feynman.S_get_sin import get_sin
-from theories.feynman.S_get_sqrt import get_sqrt
-from theories.feynman.S_get_squared import get_squared
+from theories.feynman.S_get_asin import get_asin
+from theories.feynman.S_get_cos import get_cos
+from theories.feynman.S_get_acos import get_acos
 from theories.feynman.S_get_tan import get_tan
-from theories.feynman.S_translational_symmetry_divide import translational_symmetry_divide
+from theories.feynman.S_get_atan import get_atan
+from theories.feynman.S_get_squared import get_squared
+from theories.feynman.S_get_sqrt import get_sqrt
+from theories.feynman.S_create_new_file_for_NN_add import create_new_file_for_NN_add
+from theories.feynman.S_create_new_file_for_NN_mult import create_new_file_for_NN_mult
+from theories.feynman.S_create_new_file_for_NN_eq_vars import create_new_file_for_NN_eq_vars
 from theories.feynman.S_translational_symmetry_minus import translational_symmetry_minus
 from theories.feynman.S_translational_symmetry_multiply import translational_symmetry_multiply
+from theories.feynman.S_translational_symmetry_divide import translational_symmetry_divide
 from theories.feynman.S_translational_symmetry_plus import translational_symmetry_plus
+from theories.feynman.S_NN_train import NN_train
+from theories.feynman.S_generate_new_dimRed_xlsx_file_translation import generate_new_dimRed_xlsx_file_translation
+from theories.feynman.S_replace_variables import replace_variables
+from theories.feynman.S_NN_eval import NN_eval
+from theories.feynman.S_generate_new_dimRed_xlsx_file_equal_vars import generate_new_dimRed_xlsx_file_equal_vars
+from theories.feynman.S_get_RMS import get_RMS
+from theories.feynman.S_create_variables_file import create_variables_file
+
+from theories.feynman.S_change_input import input_divide_2
+from theories.feynman.S_change_input import input_multiply_2
+from theories.feynman.S_change_input import input_exp
+from theories.feynman.S_change_input import input_log
+from theories.feynman.S_change_input import input_sqrt
+from theories.feynman.S_change_input import input_squared
+from theories.feynman.S_change_input import input_inverse
+from theories.feynman.S_change_input import input_sin
+from theories.feynman.S_change_input import input_asin
+from theories.feynman.S_change_input import input_cos
+from theories.feynman.S_change_input import input_acos
+from theories.feynman.S_change_input import input_tan
+from theories.feynman.S_change_input import input_atan
+
 from theories.feynman.S_try_bf_polyfit import try_bf_polyfit
+from theories.feynman.S_generate_new_dimRed_xlsx_file_transf_input import generate_new_dimRed_xlsx_file_transf_input
+from theories.feynman.S_generate_new_dimRed_xlsx_file_separable import generate_new_dimRed_xlsx_file_separable
+import pandas as pd
+from tqdm import tqdm
+from sympy import *
+from sympy.parsing.sympy_parser import parse_expr
+import time
+
 
 solved_dir = "results/solved/"
 
@@ -474,8 +484,7 @@ def find_formula(pathdir, filename, methods_tried, maxdeg_polyfit, err_threshold
                         if move_dir != 0:
                             shutil.move(original_dir + filename.split('-')[0], solved_dir)
                         return (
-                            f_s_m_1[0] * new_f_s_m_1[0], methods_tried,
-                            f_s_m_1[0] * new_f_s_m_1[0])  # temporary solution
+                        f_s_m_1[0] * new_f_s_m_1[0], methods_tried, f_s_m_1[0] * new_f_s_m_1[0])  # temporary solution
             print("Multiplicative separability not found")
         else:
             return (0, methods_tried, 0)
@@ -525,8 +534,7 @@ def find_formula(pathdir, filename, methods_tried, maxdeg_polyfit, err_threshold
                         if move_dir != 0:
                             shutil.move(original_dir + filename.split('-')[0], solved_dir)
                         return (
-                            f_s_a_1[0] + new_f_s_a_1[0], methods_tried,
-                            f_s_a_1[0] + new_f_s_a_1[0])  # temporary solution
+                        f_s_a_1[0] + new_f_s_a_1[0], methods_tried, f_s_a_1[0] + new_f_s_a_1[0])  # temporary solution
 
         else:
             return (0, methods_tried, 0)
@@ -1058,3 +1066,7 @@ def aiFeynman(pathdir, maxdeg_polyfit=4, err_threshold_polyfit=0.0001, BF_try_ti
         except Exception as e:
             print(e)
             continue
+
+
+
+

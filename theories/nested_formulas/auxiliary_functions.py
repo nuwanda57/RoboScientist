@@ -30,20 +30,3 @@ def add_rational_in_name(name: str) -> str:
     else:
         position = name.find('power')
     return name[:position] + "rational_" + name[position:]
-
-
-def info(formula):
-    print("depth: {}, number of variables: {}, total parameters: {}".format(
-        formula.depth, formula.num_variables, len(formula.parameters)))
-
-
-def print_formula(formula, mode="slow"):
-    #     info(network)
-    if mode == "slow":
-        display(Math(str(formula)))
-    else:
-        print(formula)
-
-
-def remove_zero_minutes(minutes):
-    return str(int(minutes)) + ' minutes ' if minutes > 0 else ''

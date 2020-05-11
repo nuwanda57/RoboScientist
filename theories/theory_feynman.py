@@ -1,10 +1,10 @@
-import os
-import re
-from contextlib import redirect_stdout
-from copy import copy
-
 import numpy as np
+import sys
+import os
+from copy import copy
+from contextlib import redirect_stdout
 from sklearn.metrics import mean_squared_error
+import re
 
 from theories import base
 from theories.feynman.aiFeynman import aiFeynman
@@ -40,11 +40,10 @@ class TheoryFeynman(base.TheoryBase):
         formula = ''.join(text[:right])
         self._logger.info('Resulting formula {}'.format(formula))
         self._formula_string = formula
-
+        
     def calculate_test_mse(self, X_test, y_test):
         f = copy(self._formula_string)
-
-        f = f.replace('sqrt', 'np.sqrt').replace('exp', 'np.exp') \
+        f = f.replace('sqrt', 'np.sqrt').replace('exp', 'np.exp')\
             .replace('pi', 'np.pi').replace('sin', 'np.sin').replace('log', 'np.log').replace('cos', 'np.cos')
 
         self._logger.info('Trying to evaluate formula: {}.'.format(
@@ -55,11 +54,8 @@ class TheoryFeynman(base.TheoryBase):
             mse = mean_squared_error(pred, y_test)
             if np.isnan(mse):
                 self._logger.info('MSE is None')
-                self._logger.info('HERE1!!!')
                 return 1000
             self._logger.info('MSE: {}'.format(mse))
-            self._logger.info('HERE2!!!')
-
             return mse
         except Exception as error:
             self._logger.error('Unable to evaluate formula {}. MSE=1000'.format(self._formula_string))

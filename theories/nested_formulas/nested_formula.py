@@ -1,9 +1,9 @@
-import torch.nn as nn
+import torch
 
-from theories.nested_formulas.auxiliary_functions import *
+import theories.nested_formulas.auxiliary_functions as auxiliary_functions
 
 
-class NestedFormula(nn.Module):
+class NestedFormula(torch.nn.Module):
     """
     Class used for representing formulas
     
@@ -13,29 +13,17 @@ class NestedFormula(nn.Module):
         subformulas - list of subformulas of smaller depth, which are used for computing
     """
 
-    def __init__(self, depth=0, num_variables=1,
-                 #                  functions=["tan", "sin", "cos", "ln", "atan", "asin", "acos"]
-                 ):
+    def __init__(self, depth=0, num_variables=1):
         super(NestedFormula, self).__init__()
         self.depth = depth
         self.num_variables = num_variables
-        self.subformulas = nn.ModuleList()
-        #         self.map_names_to_functions = {
-        #             "tan": torch.tan,
-        #             "sin": torch.sin,
-        #             "cos": torch.cos,
-        #             "atan": torch.atan,
-        #             "asin": torch.asin,
-        #             "acos": torch.acos,
-        #             "ln": torch.log
-        #         }
-        #         self.functions = functions
+        self.subformulas = torch.nn.ModuleList()
 
         # When depth is zero, formula is just a real number
         if depth == 0:
-            new_lambda = nn.Parameter((2 * torch.randn((1, 1)))).requires_grad_(True)
+            new_lambda = torch.nn.Parameter((2 * torch.randn((1, 1)))).requires_grad_(True)
             self.register_parameter("lambda_0", new_lambda)
-            new_rational_lambda = nn.Parameter(torch.tensor([0., 0.])).requires_grad_(False)
+            new_rational_lambda = torch.nn.Parameter(torch.tensor([0., 0.])).requires_grad_(False)
             self.register_parameter("rational_lambda_0", new_rational_lambda)
         else:
             for i in range(self.num_variables):
@@ -43,19 +31,14 @@ class NestedFormula(nn.Module):
                 if self.depth != 1:
                     subformula = NestedFormula(self.depth - 1, self.num_variables)
                     self.subformulas.append(subformula)
-                new_lambda = nn.Parameter((2 * torch.randn((1, 1)))).requires_grad_(True)
-                new_power = nn.Parameter((2 * torch.randn((1, 1)))).requires_grad_(True)
-                new_rational_lambda = nn.Parameter(torch.tensor([0., 0.])).requires_grad_(False)
-                new_rational_power = nn.Parameter(torch.tensor([0., 0.])).requires_grad_(False)
+                new_lambda = torch.nn.Parameter((2 * torch.randn((1, 1)))).requires_grad_(True)
+                new_power = torch.nn.Parameter((2 * torch.randn((1, 1)))).requires_grad_(True)
+                new_rational_lambda = torch.nn.Parameter(torch.tensor([0., 0.])).requires_grad_(False)
+                new_rational_power = torch.nn.Parameter(torch.tensor([0., 0.])).requires_grad_(False)
                 self.register_parameter("lambda_{}".format(i), new_lambda)
                 self.register_parameter("power_{}".format(i), new_power)
                 self.register_parameter("rational_lambda_{}".format(i), new_rational_lambda)
                 self.register_parameter("rational_power_{}".format(i), new_rational_power)
-
-            #                 for function in functions:
-            #                     new_lambda = nn.Parameter((2 * torch.randn((1, 1)))).requires_grad_(True)
-            #                     self.register_parameter("lambda_{}".format(function), new_lambda)
-
             self.last_subformula = NestedFormula(self.depth - 1, self.num_variables)
 
     def forward(self, x):
@@ -76,10 +59,6 @@ class NestedFormula(nn.Module):
             if self.depth != 1:
                 subformula_result = self.subformulas[i](x)
             ans += self.get_lambda(i) * x_powered * subformula_result
-
-            # Here I should modify my code in order to make it possible to use sine cosine etc.
-            # But this is not urgent, so I probably won't do that.
-
         ans += self.last_subformula(x)
         return ans
 
@@ -119,29 +98,21 @@ class NestedFormula(nn.Module):
                 simplified_version_for_iteration = copy.deepcopy(simplified_version)
                 simplified_state_dict_for_iteration = simplified_version_for_iteration.state_dict()
                 y_predict = simplified_version(X_val)
-                loss = nn.MSELoss()(y_val, y_predict)
-                descriptive_length_of_loss = descriptive_length_of_real_number(loss)
-                descriptive_length_of_existing_parameter = descriptive_length_of_real_number(value)
+                loss = torch.nn.MSELoss()(y_val, y_predict)
+                descriptive_length_of_loss = auxiliary_functions.descriptive_length_of_real_number(loss)
+                descriptive_length_of_existing_parameter = auxiliary_functions.descriptive_length_of_real_number(value)
 
                 # Iterate over all possible denominators
                 for possible_denominator in range(1, max_denominator + 1):
-                    #                     print("trying denominator", possible_denominator)
                     simplified_parameter_numerator = torch.round(value * possible_denominator)
                     simplified_state_dict_for_iteration[key] = simplified_parameter_numerator / possible_denominator
                     simplified_version_for_iteration.load_state_dict(simplified_state_dict_for_iteration)
-                    descriptive_length_of_simplified_parameter = descriptive_length_of_fraction(
+                    descriptive_length_of_simplified_parameter = auxiliary_functions.descriptive_length_of_fraction(
                         simplified_parameter_numerator, possible_denominator)
-                    #                     print(simplified_parameter_numerator, possible_denominator)
                     y_predict_simplified = simplified_version_for_iteration(X_val)
-                    loss_of_simplified_model = nn.MSELoss()(y_val, y_predict_simplified)
-                    descriptive_length_of_loss_of_simplified_model = descriptive_length_of_real_number(
+                    loss_of_simplified_model = torch.nn.MSELoss()(y_val, y_predict_simplified)
+                    descriptive_length_of_loss_of_simplified_model = auxiliary_functions.descriptive_length_of_real_number(
                         loss_of_simplified_model)
-                    # If the descriptive length did not improve, revert the change.
-                    #                     print("descriptive_length_of_loss_of_simplified_model", descriptive_length_of_loss_of_simplified_model)
-                    #                     print("descriptive_length_of_simplified_parameter", descriptive_length_of_simplified_parameter)
-                    #                     print("descriptive_length_of_loss", descriptive_length_of_loss)
-                    #                     print("descriptive_length_of_existing_parameter", descriptive_length_of_existing_parameter)
-
                     if descriptive_length_of_loss_of_simplified_model + descriptive_length_of_simplified_parameter > descriptive_length_of_loss + descriptive_length_of_existing_parameter:
                         simplified_version_for_iteration.load_state_dict(simplified_state_dict)
                     else:
@@ -178,8 +149,8 @@ class NestedFormula(nn.Module):
         """
         if self.depth == 0:
             if self.get_rational_lambda(0)[1] > 0:  # if it is equal to 0, it means that there is no rational value
-                return form_fraction_representation(self.get_rational_lambda(0))
-            return form_real(self.get_lambda(0))
+                return auxiliary_functions.form_fraction_representation(self.get_rational_lambda(0))
+            return auxiliary_functions.form_real(self.get_lambda(0))
 
         ans = ["\left("]
         for i in range(self.num_variables):
@@ -187,15 +158,15 @@ class NestedFormula(nn.Module):
             if i != 0 and self.get_lambda(i) > 0:
                 ans.append(" + ")
             if self.get_rational_lambda(i)[1] > 0:
-                ans.append(form_fraction_representation(self.get_rational_lambda(i)))
+                ans.append(auxiliary_functions.form_fraction_representation(self.get_rational_lambda(i)))
             else:
-                ans.append(form_real(self.get_lambda(i)))
+                ans.append(auxiliary_functions.form_real(self.get_lambda(i)))
                 # Then we add variable and its power
             ans.append("x_{}^".format(i + 1) + "{")
             if self.get_rational_power(i)[1] > 0:
-                ans.append(form_fraction_representation(self.get_rational_power(i)))
+                ans.append(auxiliary_functions.form_fraction_representation(self.get_rational_power(i)))
             else:
-                ans.append(form_real(self.get_power(i)))
+                ans.append(auxiliary_functions.form_real(self.get_power(i)))
             ans += "}"
             # Then we add the corresponding subformula
             if self.depth != 1:
