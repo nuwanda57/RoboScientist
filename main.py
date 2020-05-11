@@ -9,10 +9,8 @@ import os
 
 def main():
     feynman_dir = os.path.join(os.getcwd(), 'theories/feynman/')
-    nested_formulas_dir = os.path.join(os.getcwd(), 'theories/nested_formulas/')
     working_dirs = {
         theory_feynman.TheoryFeynman: feynman_dir,
-        theory_nested_formulas.TheoryNestedFormula: nested_formulas_dir
     }
 
     current_dir = os.getcwd()
