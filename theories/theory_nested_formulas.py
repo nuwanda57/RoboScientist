@@ -112,5 +112,5 @@ class TheoryNestedFormula(base.TheoryBase):
 
     def __deepcopy__(self, memodict={}):
         new_obj = super().__deepcopy__(memodict)
-        new_obj.predictor = pickle.loads(pickle.dumps(self._model))
+        new_obj._model = pickle.loads(pickle.dumps(self._model))
         return new_obj
