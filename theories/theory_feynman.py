@@ -1,5 +1,4 @@
 import numpy as np
-import sys
 import os
 from copy import copy
 from contextlib import redirect_stdout
