@@ -84,6 +84,7 @@ class MasterTheory(base.TheoryBase):
         return new_obj
 
     def std(self, x):
+        # We make predictions on the given dataset using all models that we have, and then take the variance
         predictions = []
         for model_number in range(self.n_models):
             predictions.append(self._all_models[model_number]._model.forward(x).detach())
