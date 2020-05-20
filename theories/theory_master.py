@@ -6,10 +6,18 @@ import copy
 from theories import base, theory_nested_formulas
 
 
-class TheoryMultipleNestedFormulas(base.TheoryBase):
+class MasterTheory(base.TheoryBase):
+    """
+    Class used for representing theories that themselves consist from multiple theories
+
+    Attributes:
+        n_models
+        _all_models
+        _model - model from _all_models that has shown the smallest mse on train dataset
+    """
     def __init__(self, *args):
-        super(TheoryMultipleNestedFormulas, self).__init__(*args)
-        self.n_formulas = 10
+        super(MasterTheory, self).__init__(*args)
+        self.n_models = 10
         self._all_models = []
         self._model = None
 
@@ -50,19 +58,20 @@ class TheoryMultipleNestedFormulas(base.TheoryBase):
         """
         super().train(X, y)
         smallest_mse = 1e50
-        for model_number in range(self.n_formulas):
+        for model_number in range(self.n_models):
             single_theory = theory_nested_formulas.TheoryNestedFormula()
             single_theory.train(X, y)
             current_mse = single_theory.calculate_test_mse(X, y)
             if current_mse < smallest_mse:
                 current_mse = smallest_mse
-                self._model = single_theory
-            self._all_models.append(single_theory)
+                self._model = copy.deepcopy(single_theory)
+            self._all_models.append(copy.deepcopy(single_theory))
 
         self._formula_string = str(self._model)
         self._logger.info('Resulting formula {}'.format(self._formula_string))
 
     def calculate_test_mse(self, X_test, y_test):
+        # When we make predictions we use one theory that has shown the smallest mse on the train dataset
         if self._model is None:
             self._logger.info('Theory is not trained.')
             return 1000
@@ -70,10 +79,12 @@ class TheoryMultipleNestedFormulas(base.TheoryBase):
 
     def __deepcopy__(self, memodict={}):
         new_obj = super().__deepcopy__(memodict)
+        new_obj._all_models = copy.deepcopy(self._all_models)
+        new_obj._model = copy.deepcopy(self._model)
         return new_obj
 
     def std(self, x):
         predictions = []
-        for model_number in range(self.n_formulas):
+        for model_number in range(self.n_models):
             predictions.append(self._all_models[model_number]._model.forward(x).detach())
         return torch.stack(predictions).std(axis=0)

@@ -2,7 +2,7 @@ import os
 
 import learning_agent.robo_scientist as rs
 import theories.theory_feynman as theory_feynman
-import theories.theory_multiple_nested_formulas as theory_multiple_nested_formulas
+import theories.theory_master as theory_master
 import theories.theory_nested_formulas as theory_nested_formulas
 from data_generator import simple_generator, std_generator
 from environments import ohm_law, single_param_linear_law, env_1, sin
@@ -29,7 +29,7 @@ def main():
     agent = rs.RoboScientist(working_dirs, keep_full_history=True)
     for theory, generator in zip(
         [
-            theory_multiple_nested_formulas.TheoryMultipleNestedFormulas,
+            theory_master.MasterTheory,
             theory_feynman.TheoryFeynman,
             theory_nested_formulas.TheoryNestedFormula
         ],
