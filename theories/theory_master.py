@@ -1,5 +1,3 @@
-import pickle
-
 import torch
 import copy
 
@@ -12,80 +10,44 @@ class MasterTheory(base.TheoryBase):
 
     Attributes:
         n_models
-        _all_models
-        _model - model from _all_models that has shown the smallest mse on train dataset
+        _models
+        _model - model from _models that has shown the smallest mse on train dataset
     """
-    def __init__(self, *args):
+    def __init__(self, *args, theories_with_params=[(theory_nested_formulas.TheoryNestedFormula, None) for i in range(10)]):
         super(MasterTheory, self).__init__(*args)
-        self.n_models = 10
-        self._all_models = []
-        self._model = None
+        self._models = [theory(*params) if params is not None else theory() for theory, params in theories_with_params]
+        self.n_models = len(self._models)
+        self._best_model = None
 
-    def train(self, X, y, optimizer_for_formula=torch.optim.Adam, device=torch.device("cpu"), n_init=1,
-              max_iter=100,
-              lr=0.01,
-              depth=1, verbose_frequency=5000,
-              max_epochs_without_improvement=1000,
-              minimal_acceptable_improvement=1e-6, max_tol=1e-5):
-
-        """
-        Parameters:
-            X: torch.tensor, shape (n_samples, n_features)
-                Training vector, where n_samples is the number of samples and n_features is the number of features.
-            y: torch.tensor, shape (n_samples, 1)
-                Target vector relative to X.
-            optimizer_for_formula: 
-                optimizer used for solving the optimization problem
-            device:
-                device used to store the data and run the algorithm
-            n_init: int
-                number of times algorithm will be run with different initial weights.
-                The final results will be the best output of n_init consecutive runs in terms of loss.
-            max_iter: int
-                Maximum number of iterations of the algorithm for a single run.
-            depth: int
-                depth of formula to learn
-            verbose_frequency: int
-                print loss every verbose_frequency epochs
-            max_epochs_without_improvement: int
-                if during this number of epochs loss does not decrease more than minimal_acceptable_improvement, the learning process
-                will be finished
-            minimal_acceptable_improvement: float
-                if during max_epochs_without_improvement number of epochs loss does not decrease more than this number,
-                the learning process will be finished
-            max_tol: float
-                if the loss becomes smaller than this value, stop performing initializations and finish the learning process
-        """
+    def train(self, X, y):
         super().train(X, y)
         smallest_mse = 1e50
-        for model_number in range(self.n_models):
-            single_theory = theory_nested_formulas.TheoryNestedFormula()
-            single_theory.train(X, y)
-            current_mse = single_theory.calculate_test_mse(X, y)
+        for model_number, model in enumerate(self._models):
+            model.train(X, y)
+            current_mse = model.calculate_test_mse(X, y)
             if current_mse < smallest_mse:
                 current_mse = smallest_mse
-                self._model = copy.deepcopy(single_theory)
-            self._all_models.append(copy.deepcopy(single_theory))
+                self._best_model = copy.deepcopy(model)
 
-        self._formula_string = str(self._model)
+        self._formula_string = str(self._best_model)
         self._logger.info('Resulting formula {}'.format(self._formula_string))
 
     def calculate_test_mse(self, X_test, y_test):
         # When we make predictions we use one theory that has shown the smallest mse on the train dataset
-        if self._model is None:
+        if self._best_model is None:
             self._logger.info('Theory is not trained.')
             return 1000
-        return self._model.calculate_test_mse(X_test, y_test)
+        return self._best_model.calculate_test_mse(X_test, y_test)
 
     def __deepcopy__(self, memodict={}):
         new_obj = super().__deepcopy__(memodict)
-        new_obj._all_models = copy.deepcopy(self._all_models)
-        new_obj._model = copy.deepcopy(self._model)
+        new_obj._models = copy.deepcopy(self._models)
+        new_obj._model = copy.deepcopy(self._best_model)
         return new_obj
 
     def std(self, x):
         # We make predictions on the given dataset using all models that we have, and then take the variance
         predictions = []
         for model_number in range(self.n_models):
-            predictions.append(self._all_models[model_number]._model.forward(x).detach())
+            predictions.append(self._models[model_number]._model.forward(x).detach())
         return torch.stack(predictions).std(axis=0)
