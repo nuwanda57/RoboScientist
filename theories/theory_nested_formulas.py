@@ -1,7 +1,6 @@
 import pickle
 
 import torch
-import torch.nn as nn
 from sklearn.metrics import mean_squared_error
 
 from theories import base
@@ -62,7 +61,7 @@ class TheoryNestedFormula(base.TheoryBase):
             self._logger.info("\tInitialization #{}".format(init + 1))
             model = NestedFormula(depth, m).to(device)
 
-            criterion = nn.MSELoss()
+            criterion = torch.nn.MSELoss()
             epochs_without_improvement = 0
             epoch = 0
             output = model(X)
@@ -109,6 +108,9 @@ class TheoryNestedFormula(base.TheoryBase):
             return 1000
         y_pred = self._model.forward(X_test).detach()
         return mean_squared_error(y_pred, y_test)
+
+    def __str__(self):
+        return str(self._model)
 
     def __deepcopy__(self, memodict={}):
         new_obj = super().__deepcopy__(memodict)
