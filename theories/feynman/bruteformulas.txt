@@ -1,1 +1,1 @@
-(Pi/Pi)
+sin((a/exp((Pi+sqrt((Pi-1))))))

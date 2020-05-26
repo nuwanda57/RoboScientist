@@ -3,9 +3,10 @@ import os
 import learning_agent.robo_scientist as rs
 import theories.theory_feynman as theory_feynman
 import theories.theory_master as theory_master
+import theories.theory_polynomial1D as theory_poly1D
 import theories.theory_nested_formulas as theory_nested_formulas
 from data_generator import simple_generator, std_generator
-from environments import ohm_law, single_param_linear_law, env_1, sin
+from environments import ohm_law, single_param_linear_law, env_1, sin, tg, arcsin, cos
 
 
 def print_line(name):
@@ -31,28 +32,38 @@ def main():
         [
             theory_master.MasterTheory,
             theory_feynman.TheoryFeynman,
-            theory_nested_formulas.TheoryNestedFormula
+            theory_nested_formulas.TheoryNestedFormula,
+            theory_poly1D.TheoryPolynomial1D,
         ],
         [
             std_generator.STDGenerator,
             simple_generator.SimpleGenerator,
             simple_generator.SimpleGenerator,
+            simple_generator.SimpleGenerator,
         ]):
         print_line(theory.__name__)
-        for environment, params in zip(
-                [
-                    env_1.Environment1,
-                    ohm_law.OhmLawEnvironment,
-                    single_param_linear_law.LinearLawEnvironment,
-                    sin.SinEnvironment
-                ],
-                [None, [1], [2, 3], None]
-        ):
+
+        for environment, params in [
+                    (env_1.Environment1, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
+                    (ohm_law.OhmLawEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
+                                                 'resistance': 1}),
+                    (ohm_law.OhmLawEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
+                                                 'resistance': 0.57}),
+                    (single_param_linear_law.LinearLawEnvironment,
+                     {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D, 'a': 4, 'b': 3.5}),
+                    (sin.SinEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
+                    (cos.CosEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
+                    (sin.SinEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D, 'a': 2.5}),
+                    (cos.CosEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D, 'b': 4}),
+                    (sin.SinEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
+                                          'a': 12.65, 'b': 0.01}),
+                    (cos.CosEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
+                                          'a': 100, 'b': 17}),
+                    (tg.TgEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
+                    # arcsin.ArcsinEnvironment,
+        ]:
             print_line(environment.__name__)
-            if params is not None:
-                agent.explore_environment(environment(*params), theory, generator)
-            else:
-                agent.explore_environment(environment(), theory, generator)
+            agent.explore_environment(environment(**params), theory, generator)
             print('\nAnswer:', agent.get_formula_for_exploration_key(rs.ExplorationKey(
                 env=environment.__name__, theory=theory.__name__)))
     d = agent.get_full_history()

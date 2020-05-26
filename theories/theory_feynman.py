@@ -27,18 +27,21 @@ class TheoryFeynman(base.TheoryBase):
 
         solved_file = open("results/solutions/" + filename + '.txt')
 
-        text = solved_file.readlines()[0].split()
-        self._logger.info('Solved file content: {}'.format(text))
-        text.pop(0)
-        right = 0
-        for i in range(len(text)):
-            t = text[i]
-            if t[0] == '[':
-                right = i
-                break
-        formula = ''.join(text[:right])
-        self._logger.info('Resulting formula {}'.format(formula))
-        self._formula_string = formula
+        try:
+            text = solved_file.readlines()[0].split()
+            self._logger.info('Solved file content: {}'.format(text))
+            text.pop(0)
+            right = 0
+            for i in range(len(text)):
+                t = text[i]
+                if t[0] == '[':
+                    right = i
+                    break
+            formula = ''.join(text[:right])
+            self._logger.info('Resulting formula {}'.format(formula))
+            self._formula_string = formula
+        except:
+            self._logger.warn('Error while reading solution file')
         
     def calculate_test_mse(self, X_test, y_test):
         f = copy(self._formula_string)

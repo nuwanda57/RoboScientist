@@ -63,12 +63,12 @@ class PolynomialBuilder(object):
         raise UnknownPolynomialError
 
     @classmethod
-    def build_polynomials_for_2d_function(cls, ptype, cnt=None):
+    def build_polynomials_for_2d_function(cls, ptype, cnt=50):
         if ptype not in cls._POLYNOMIAL_HOLDER:
             raise UnknownPolynomialError
         polynom_cls = cls._POLYNOMIAL_HOLDER[ptype]
         P_polynoms = []
-        for deg in range(50):
+        for deg in range(cnt):
             P_polynoms.append(cls._polynomial_builder_for_2d_function(deg, True, polynom_cls.p))
             t = P_polynoms[0]
             P_polynoms.append(cls._polynomial_builder_for_2d_function(deg, False, polynom_cls.p))
@@ -82,7 +82,17 @@ class PolynomialBuilder(object):
         return P_polynoms
 
     @classmethod
-    def build_d_polynomials_for_2d_function(cls, ptype, d_ind, cnt=None):
+    def build_polynomials_for_1d_function(cls, ptype, cnt=50):
+        if ptype not in cls._POLYNOMIAL_HOLDER:
+            raise UnknownPolynomialError
+        polynom_cls = cls._POLYNOMIAL_HOLDER[ptype]
+        P_polynoms = []
+        for deg in range(cnt):
+            P_polynoms.append(cls._polynomial_builder_for_1d_function(deg, polynom_cls.p))
+        return P_polynoms
+
+    @classmethod
+    def build_d_polynomials_for_2d_function(cls, ptype, d_ind, cnt=50):
         """
         p_type: polynomial type
         d_ind: derivative index
@@ -94,7 +104,7 @@ class PolynomialBuilder(object):
             raise UnsupportedDimension
         polynom_cls = cls._POLYNOMIAL_HOLDER[ptype]
         P_polynoms = []
-        for deg in range(50):
+        for deg in range(cnt):
             if d_ind == 0:
                 P_polynoms.append(cls._polynomial_builder_for_2d_function(deg, True, polynom_cls.d_p))
                 P_polynoms.append(lambda x1, x2: 0)
@@ -117,6 +127,21 @@ class PolynomialBuilder(object):
                             deg - first_monom_deg, first_monom_deg, polynom_cls.p, polynom_cls.d_p))
         return P_polynoms
 
+    @classmethod
+    def build_d_polynomials_for_1d_function(cls, ptype, cnt=50):
+        """
+        p_type: polynomial type
+        d_ind: derivative index
+        cnt: number of polynomials to return. Currently unsupported
+        """
+        if ptype not in cls._POLYNOMIAL_HOLDER:
+            raise UnknownPolynomialError
+        polynom_cls = cls._POLYNOMIAL_HOLDER[ptype]
+        P_polynoms = []
+        for deg in range(cnt):
+            P_polynoms.append(cls._polynomial_builder_for_1d_function(deg, polynom_cls.d_p))
+        return P_polynoms
+
     @staticmethod
     def _polynomial_builder_for_2d_function(n, is_first_arg, func):
         t = _copy_func(func)
@@ -124,6 +149,12 @@ class PolynomialBuilder(object):
         if is_first_arg:
             return lambda x1, x2: t(x1)
         return lambda x1, x2: t(x2)
+
+    @staticmethod
+    def _polynomial_builder_for_1d_function(n, func):
+        t = _copy_func(func)
+        t.__defaults__ = (n,)
+        return lambda x: t(x)
 
     @staticmethod
     def _polynomial_combination_builder_for_2d_function(n1, n2, func1, func2):

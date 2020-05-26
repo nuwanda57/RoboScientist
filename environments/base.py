@@ -6,11 +6,13 @@ class EnvironmentBase(object):
     """
     Mystery environment, runs experiments with input_data.
     """
-    def __init__(self, parameters_count: int):
+    def __init__(self, parameters_count: int, include_derivatives: bool=False):
         """
         :param parameters_count: Number of variables that have to be passed to experiments.
+        :param include_derivatives: Include derivatives results
         """
         self._logger = logging.getLogger('rs.%s' % self.__class__.__name__)
+        self._include_derivatives = include_derivatives
         self.parameters_count = parameters_count
 
     def run_experiments(self, input_data: torch.Tensor) -> torch.Tensor:

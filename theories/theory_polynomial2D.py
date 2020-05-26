@@ -1,12 +1,14 @@
 from copy import deepcopy, copy
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import pickle
+from sklearn.metrics import mean_squared_error
 
 from theories import base
 from theories.polynomial import builder as polynomial_builder
 
 
-class TheoryPolynomial(base.TheoryBase):
+class TheoryPolynomial2D(base.TheoryBase):
     def __init__(self, params_cnt: int = 1, polynomial_type: str = 'Chebyshev', polynomial_cnt : int = 10):
         """
         :param params_cnt:
@@ -32,8 +34,12 @@ class TheoryPolynomial(base.TheoryBase):
 
     def calculate_test_mse(self, X_test, y_test):
         super().calculate_test_mse(X_test, y_test)
-        return None
+        return mean_squared_error(self._model.predict(X_test), y_test)
 
     def __deepcopy__(self, memodict={}):
-        # TODO(nuwanda): implement
-        pass
+        new_obj = super().__deepcopy__(memodict)
+        new_obj._model = pickle.loads(pickle.dumps(self._model))
+        new_obj._polynomials = deepcopy(self._polynomials)
+        new_obj._polynomials_d1 = deepcopy(self._polynomials_d1)
+        new_obj._polynomials_d2 = deepcopy(self._polynomials_d2)
+        return new_obj

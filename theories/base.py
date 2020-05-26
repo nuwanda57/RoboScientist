@@ -13,11 +13,11 @@ class TheoryBase(object):
         self._formula_string = ''
 
     def train(self, X_train, y_train):
-        self._logger.info('Training theory with \n\tX={};\n\ty={}'.format(X_train, y_train))
+        # self._logger.info('Training theory with \n\tX={};\n\ty={}'.format(X_train, y_train))
         pass
 
     def calculate_test_mse(self, X_test, y_test):
-        self._logger.info('Calculation test MSE for \n\tX={};\n\ty={}'.format(X_test, y_test))
+        # self._logger.info('Calculation test MSE for \n\tX={};\n\ty={}'.format(X_test, y_test))
         pass
 
     def show_formula(self):
