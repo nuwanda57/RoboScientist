@@ -36,7 +36,8 @@ class RoboScientist(object):
     def explore_environment(self, new_env: env_base.EnvironmentBase,
                             theory_class: Type[theory_base.TheoryBase],
                             generator_class: Type[gen_base.GeneratorBase],
-                            epochs: int = 10) -> theory_base.TheoryBase:
+                            epochs: int = 10,
+                            theory_params: Optional[Dict]=None) -> theory_base.TheoryBase:
         """
         :param new_env: Environment to explore.
         :param theory_class: Theory class that will be used for the exploration.
@@ -55,7 +56,9 @@ class RoboScientist(object):
 
         X_train = None
         generator = generator_class(new_env)
-        theory = theory_class(new_env.parameters_count)
+        if theory_params is None:
+            theory_params = {}
+        theory = theory_class(new_env.parameters_count, **theory_params)
         for epoch in range(epochs):
             self._logger.info('------------------------------------------------------------------------------------\n')
             self._logger.info('EPOCH {}'.format(epoch))
