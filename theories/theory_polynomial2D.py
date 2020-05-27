@@ -9,7 +9,7 @@ from theories.polynomial import builder as polynomial_builder
 
 
 class TheoryPolynomial2D(base.TheoryBase):
-    def __init__(self, params_cnt: int = 1, polynomial_type: str = 'Chebyshev', polynomial_cnt : int = 10):
+    def __init__(self, params_cnt: int = 1, polynomial_type: str = 'Chebyshev', polynomial_cnt : int = 5):
         """
         :param params_cnt:
         :param polynomial_type: Polynomial type.
@@ -31,10 +31,16 @@ class TheoryPolynomial2D(base.TheoryBase):
             [[poly(x[0], x[1]) for poly in self._polynomials_d1] for x in X_train] + \
             [[poly(x[0], x[1]) for poly in self._polynomials_d2] for x in X_train])
         self._model.fit(A_with_grad, F_with_grad)
+        self._formula_string = ["%.2f" % a for a in [self._model.intercept_] + self._model.coef_]
 
     def calculate_test_mse(self, X_test, y_test):
         super().calculate_test_mse(X_test, y_test)
-        return mean_squared_error(self._model.predict(X_test), y_test)
+        F_with_grad = np.copy(y_test)
+        A_with_grad = np.array(
+            [[poly(x[0], x[1]) for poly in self._polynomials] for x in X_test] + \
+            [[poly(x[0], x[1]) for poly in self._polynomials_d1] for x in X_test] + \
+            [[poly(x[0], x[1]) for poly in self._polynomials_d2] for x in X_test])
+        return mean_squared_error(self._model.predict(A_with_grad), F_with_grad)
 
     def __deepcopy__(self, memodict={}):
         new_obj = super().__deepcopy__(memodict)

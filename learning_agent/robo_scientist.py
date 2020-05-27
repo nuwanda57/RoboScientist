@@ -102,7 +102,7 @@ class RoboScientist(object):
         return []
 
     def _update_history(self, key, theory, generator, new_env):
-        X_test = generator.ask(theory, None)
+        X_test = generator.ask(theory, None, 50)
         y_test = new_env.run_experiments(X_test)
         mse = theory.calculate_test_mse(X_test, y_test)
         formula = theory.get_formula()

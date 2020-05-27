@@ -12,7 +12,8 @@ class SimpleGenerator(dg_base.GeneratorBase):
     def _env_1_ask(n: int):
         return 1 + 2 * torch.rand(n)
 
-    def ask(self, theory: theories_base.TheoryBase, previous_exploration_input: Optional[torch.tensor]) -> torch.tensor:
+    def ask(self, theory: theories_base.TheoryBase,
+            previous_exploration_input: Optional[torch.tensor], cnt=None) -> torch.tensor:
         """
         :param theory: Theory which is used to explore the environment.
         If ask has already been called for the generator, the theory learnt in the previous step should be passed.
@@ -20,10 +21,13 @@ class SimpleGenerator(dg_base.GeneratorBase):
         If no exploration has been made, this should be None.
         :return: Input for the next exploration step.
         """
-        super().ask(theory, previous_exploration_input)
+        super().ask(theory, previous_exploration_input, cnt)
         new_data_size = 2 if previous_exploration_input is None else previous_exploration_input.shape[0] + 1
+        if cnt is not None:
+            new_data_size = cnt
         if self._env.__class__ == env_1.Environment1:
             return self._env_1_ask(new_data_size)
+        left, right = self._env.left, self._env.right
         if self._env.parameters_count == 1:
-            return 50 * torch.rand(new_data_size)
-        return 50 * torch.rand(new_data_size, self._env.parameters_count)
+            return (right - left) * torch.rand(new_data_size) + left
+        return (right - left) * torch.rand(new_data_size, self._env.parameters_count) + left

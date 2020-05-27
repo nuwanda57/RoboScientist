@@ -3,8 +3,8 @@ import torch
 
 
 class SinEnvironment(base.EnvironmentBase):
-    def __init__(self, a=1, b=1, include_derivatives=False):
-        super().__init__(1, include_derivatives=include_derivatives)
+    def __init__(self, a=1, b=1, include_derivatives=False, left=-1, right=1):
+        super().__init__(1, include_derivatives=include_derivatives, left=left, right=right)
         self._a = a
         self._b = b
 

@@ -107,7 +107,10 @@ class TheoryNestedFormula(base.TheoryBase):
             self._logger.info('Theory is not trained.')
             return 1000
         y_pred = self._model.forward(X_test).detach()
-        return mean_squared_error(y_pred, y_test)
+        try:
+            return mean_squared_error(y_pred, y_test)
+        except:
+            return 1000
 
     def __str__(self):
         return str(self._model)

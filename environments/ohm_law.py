@@ -6,11 +6,11 @@ class OhmLawEnvironment(base.EnvironmentBase):
     """
     Environment representing the Ohm's law.
     """
-    def __init__(self, resistance: float, include_derivatives=False):
+    def __init__(self, resistance: float, include_derivatives=False, left=-1, right=1):
         """
         :param resistance: Resistance value in the Ohm's law.
         """
-        super().__init__(1, include_derivatives)
+        super().__init__(1, include_derivatives, left=left, right=right)
         self._resistance = resistance
 
     def run_experiments(self, input_data: torch.Tensor):

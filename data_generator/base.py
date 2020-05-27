@@ -15,7 +15,8 @@ class GeneratorBase(object):
         self._logger.info('Creating generator for {}.'.format(environment.__class__.__name__))
         self._env = environment
 
-    def ask(self, theory: theories_base.TheoryBase, previous_exploration_input: Optional[torch.tensor]) -> torch.tensor:
+    def ask(self, theory: theories_base.TheoryBase,
+            previous_exploration_input: Optional[torch.tensor], cnt=None) -> torch.tensor:
         """
         :param theory: Theory which is used to explore the environment.
         :param previous_exploration_input:  Input that has been passed to the previous exploration step.
