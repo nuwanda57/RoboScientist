@@ -12,7 +12,7 @@ class STDGenerator(dg_base.GeneratorBase):
         self.n_attempts = n_attempts
 
     def ask(self, theory: theory_master.MasterTheory,
-            previous_exploration_input: Optional[torch.tensor]) -> torch.tensor:
+            previous_exploration_input: Optional[torch.tensor], cnt=None) -> torch.tensor:
         """
         :param theory: Theory which is used to explore the environment.
         If ask has already been called for the generator, the theory learnt in the previous step should be passed.
