@@ -29,67 +29,14 @@ def main():
     os.chdir(current_dir)
 
     agent = rs.RoboScientist(working_dirs, keep_full_history=True)
-    # for theory, generator in zip(
-    #     [
-    #         theory_master.MasterTheory,
-    #         theory_feynman.TheoryFeynman,
-    #         theory_nested_formulas.TheoryNestedFormula,
-    #         theory_poly1D.TheoryPolynomial1D,
-    #     ],
-    #     [
-    #         std_generator.STDGenerator,
-    #         simple_generator.SimpleGenerator,
-    #         simple_generator.SimpleGenerator,
-    #         simple_generator.SimpleGenerator,
-    #     ]):
-    #     print_line(theory.__name__)
-    #
-    #     for environment, params in [
-    #                 (env_1.Environment1, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
-    #                 (ohm_law.OhmLawEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
-    #                                              'resistance': 1}),
-    #                 (ohm_law.OhmLawEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
-    #                                              'resistance': 0.57}),
-    #                 (single_param_linear_law.LinearLawEnvironment,
-    #                  {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D, 'a': 4, 'b': 3.5}),
-    #                 (sin.SinEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
-    #                 (cos.CosEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
-    #                 (sin.SinEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D, 'a': 2.5}),
-    #                 (cos.CosEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D, 'b': 4}),
-    #                 (sin.SinEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
-    #                                       'a': 12.65, 'b': 0.01}),
-    #                 (cos.CosEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D,
-    #                                       'a': 100, 'b': 17}),
-    #                 (tg.TgEnvironment, {'include_derivatives': theory == theory_poly1D.TheoryPolynomial1D}),
-    #                 # arcsin.ArcsinEnvironment,
-    #     ]:
-    #         print_line(environment.__name__)
-    #         agent.explore_environment(environment(**params), theory, generator)
-    #         print('\nAnswer:', agent.get_formula_for_exploration_key(rs.ExplorationKey(
-    #             env=environment.__name__, theory=theory.__name__)))
+    env = env_1.Environment1
 
-    # t = theory_poly2D.TheoryPolynomial2D
-    env = env_2.Environment2
-    # agent.explore_environment(env(include_derivatives=True), t, simple_generator.SimpleGenerator, 100)
-    # print_line(env.__name__)
-    # print('\nAnswer:', agent.get_formula_for_exploration_key(
-    #     rs.ExplorationKey(env=env.__name__, theory=t.__name__)))
-    # d = agent.get_full_history()
-    # for k in d:
-    #     print(k, '\n\t', d[k], '\n')
-
-    # env = ohm_law.OhmLawEnvironment
     t = theory_feynman.TheoryFeynman
     agent.explore_environment(env(), t, simple_generator.SimpleGenerator, 5)
     print_line(env.__name__)
     print('\nAnswer:', agent.get_formula_for_exploration_key(
         rs.ExplorationKey(env=env.__name__, theory=t.__name__)))
 
-    # t = theory_nested_formulas.NestedFormula
-    # agent.explore_environment(env(), t, simple_generator.SimpleGenerator, 5)
-    # print_line(env.__name__)
-    # print('\nAnswer:', agent.get_formula_for_exploration_key(
-    #     rs.ExplorationKey(env=env.__name__, theory=t.__name__)))
 
 if __name__ == '__main__':
     main()
